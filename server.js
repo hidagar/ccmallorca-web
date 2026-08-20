@@ -1,5 +1,8 @@
-// Servidor de la web de CC Mallorca con editor tipo FrontPage.
-// Sense dependencies: nomes moduls natius de Node.
+// Servidor de la web de CC Mallorca amb editor tipus FrontPage.
+// Sense dependencies: nomes moduls natius de Node. CommonJS expressament
+// (no .mjs) perque funcioni sense flags experimentals en versions antigues
+// de Node com les que ofereixen alguns hostings compartits (cPanel/CloudLinux
+// NodeJS Selector amb Node 11 o similar).
 //
 // Rutes publiques:
 //   GET  /                 -> la web
@@ -16,14 +19,13 @@
 //   CCM_PORT      (5002) — o PORT, que es el que injecta cPanel/Passenger
 //   CCM_DATA_DIR  (/var/www/ccmallorca-data)
 
-import http from 'node:http'
-import { readFile, writeFile, mkdir, copyFile, readdir, unlink } from 'node:fs/promises'
-import { existsSync, createReadStream, statSync } from 'node:fs'
-import path from 'node:path'
-import crypto from 'node:crypto'
-import { fileURLToPath } from 'node:url'
+const http = require('http')
+const { readFile, writeFile, mkdir, copyFile, readdir, unlink } = require('fs').promises
+const { existsSync, createReadStream, statSync } = require('fs')
+const path = require('path')
+const crypto = require('crypto')
 
-const HERE = path.dirname(fileURLToPath(import.meta.url))
+const HERE = __dirname
 // cPanel/Passenger assigna el port amb la variable PORT; als nostres
 // scripts de systemd fem servir CCM_PORT. Acceptem qualsevol de les dues.
 const PORT = Number(process.env.PORT || process.env.CCM_PORT) || 5002
@@ -55,13 +57,24 @@ const MIME = {
   '.pdf': 'application/pdf',
 }
 
-function sendJson(res, code, obj, headers = {}) {
+// Codificacio base64url manual: Node no la va afegir com a "encoding" natiu
+// de Buffer fins la v15.7, i volem funcionar tambe en versions mes antigues.
+function toBase64Url(buf) {
+  return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+function fromBase64Url(str) {
+  let s = String(str).replace(/-/g, '+').replace(/_/g, '/')
+  while (s.length % 4) s += '='
+  return Buffer.from(s, 'base64')
+}
+
+function sendJson(res, code, obj, headers) {
   const body = JSON.stringify(obj)
-  res.writeHead(code, {
-    'Content-Type': 'application/json; charset=utf-8',
-    'Cache-Control': 'no-store',
-    ...headers,
-  })
+  const finalHeaders = Object.assign(
+    { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
+    headers || {}
+  )
+  res.writeHead(code, finalHeaders)
   res.end(body)
 }
 
@@ -95,7 +108,7 @@ function sanitizeHtml(html) {
     if (t === 'br') return '<br>'
     if (t === 'a') {
       const m = /href\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(attrs)
-      let url = (m ? (m[2] ?? m[3] ?? m[4] ?? '') : '').trim()
+      let url = (m ? (m[2] || m[3] || m[4] || '') : '').trim()
       if (!/^(https?:\/\/|mailto:|#|\/|\.\/)/i.test(url)) url = ''
       return url
         ? `<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">`
@@ -135,7 +148,7 @@ async function ensureData() {
     }
     await writeFile(CONFIG_FILE, JSON.stringify(config, null, 2))
     console.log(`Configuracio creada. Contrasenya d'edicio: "${password}"`)
-    console.log('Canvia-la amb: node server.mjs --set-password NOVA')
+    console.log('Canvia-la amb: node server.js --set-password NOVA')
   }
 }
 
@@ -152,11 +165,11 @@ async function loadContent() {
 }
 
 function sign(value, secret) {
-  return crypto.createHmac('sha256', secret).update(value).digest('base64url')
+  return toBase64Url(crypto.createHmac('sha256', secret).update(value).digest())
 }
 
 function makeToken(secret) {
-  const payload = Buffer.from(JSON.stringify({ exp: Date.now() + 12 * 3600 * 1000 })).toString('base64url')
+  const payload = toBase64Url(Buffer.from(JSON.stringify({ exp: Date.now() + 12 * 3600 * 1000 })))
   return `${payload}.${sign(payload, secret)}`
 }
 
@@ -167,8 +180,8 @@ function verifyToken(token, secret) {
   if (sig.length !== expected.length) return false
   if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return false
   try {
-    return JSON.parse(Buffer.from(payload, 'base64url').toString()).exp > Date.now()
-  } catch {
+    return JSON.parse(fromBase64Url(payload).toString()).exp > Date.now()
+  } catch (e) {
     return false
   }
 }
@@ -176,8 +189,9 @@ function verifyToken(token, secret) {
 function readCookie(req, name) {
   const raw = req.headers.cookie || ''
   for (const part of raw.split(';')) {
-    const [k, ...v] = part.trim().split('=')
-    if (k === name) return decodeURIComponent(v.join('='))
+    const kv = part.trim().split('=')
+    const k = kv.shift()
+    if (k === name) return decodeURIComponent(kv.join('='))
   }
   return null
 }
@@ -220,7 +234,8 @@ function mergeContent(current, incoming) {
   }
 
   const pages = incoming && typeof incoming.pages === 'object' ? incoming.pages : {}
-  for (const [slug, page] of Object.entries(pages)) {
+  for (const slug of Object.keys(pages)) {
+    const page = pages[slug]
     const target = out.pages[slug]
     if (!target || !page) continue
 
@@ -228,7 +243,7 @@ function mergeContent(current, incoming) {
     if (typeof page.intro === 'string') target.intro = sanitizeHtml(page.intro)
 
     for (const block of Array.isArray(page.blocks) ? page.blocks : []) {
-      const dest = target.blocks.find((b) => b.id === block?.id)
+      const dest = target.blocks.find((b) => b.id === (block && block.id))
       if (!dest) continue
 
       if (dest.type === 'heading' && typeof block.text === 'string') {
@@ -271,7 +286,7 @@ async function saveContentWithBackup(content) {
     for (const old of files.slice(0, Math.max(0, files.length - 30))) {
       await unlink(path.join(BACKUP_DIR, old)).catch(() => {})
     }
-  } catch {}
+  } catch (e) {}
   await writeFile(CONTENT_FILE, JSON.stringify(content, null, 2))
 }
 
@@ -296,7 +311,7 @@ async function handleUpload(body) {
   let buf
   try {
     buf = Buffer.from(base64, 'base64')
-  } catch {
+  } catch (e) {
     return { error: 'El archivo no es válido' }
   }
   if (buf.length < 12) return { error: 'El archivo no es válido' }
@@ -335,7 +350,8 @@ async function handleUpload(body) {
 
 // -------------------------------------------------------- fitxers estatics
 
-function serveFile(res, filePath, { cache = false } = {}) {
+function serveFile(res, filePath, opts) {
+  const cache = opts && opts.cache
   try {
     const st = statSync(filePath)
     if (!st.isFile()) throw new Error('not a file')
@@ -345,7 +361,7 @@ function serveFile(res, filePath, { cache = false } = {}) {
       'Cache-Control': cache ? 'public, max-age=3600' : 'no-cache',
     })
     createReadStream(filePath).pipe(res)
-  } catch {
+  } catch (e) {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' })
     res.end('No encontrado')
   }
@@ -372,7 +388,7 @@ function readBody(req) {
     req.on('end', () => {
       try {
         resolve(chunks.length ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : {})
-      } catch {
+      } catch (e) {
         reject(new Error('bad json'))
       }
     })
@@ -435,7 +451,7 @@ const server = http.createServer(async (req, res) => {
       return serveFile(res, CONTENT_FILE)
     }
 
-    if (pathname.startsWith('/uploads/')) {
+    if (pathname.indexOf('/uploads/') === 0) {
       const target = safeJoin(UPLOADS_DIR, pathname.slice('/uploads/'.length))
       return target ? serveFile(res, target, { cache: true }) : sendJson(res, 400, { error: 'Ruta no válida' })
     }
@@ -448,20 +464,15 @@ const server = http.createServer(async (req, res) => {
     }
     return serveFile(res, path.join(PUBLIC_DIR, 'index.html'))
   } catch (err) {
-    const msg = err?.message === 'too large' ? 'El archivo es demasiado grande' : 'Error del servidor'
-    return sendJson(res, err?.message === 'too large' ? 413 : 500, { error: msg })
+    const isTooLarge = err && err.message === 'too large'
+    const msg = isTooLarge ? 'El archivo es demasiado grande' : 'Error del servidor'
+    return sendJson(res, isTooLarge ? 413 : 500, { error: msg })
   }
 })
 
 // ------------------------------------------------------------------- arrencada
 
-const setPwdIdx = process.argv.indexOf('--set-password')
-if (setPwdIdx !== -1) {
-  const nueva = process.argv[setPwdIdx + 1]
-  if (!nueva) {
-    console.error('Us: node server.mjs --set-password NOVA_CONTRASENYA')
-    process.exit(1)
-  }
+async function setPasswordAndExit(nueva) {
   await ensureData()
   const cfg = await loadConfig()
   cfg.salt = crypto.randomBytes(16).toString('hex')
@@ -477,7 +488,27 @@ if (setPwdIdx !== -1) {
 // hi faci de pont; per aixo es pot forçar amb CCM_HOST.
 const HOST = process.env.CCM_HOST || '127.0.0.1'
 
-await ensureData()
-server.listen(PORT, HOST, () => {
-  console.log(`CC Mallorca escoltant a http://${HOST}:${PORT} (dades: ${DATA_DIR})`)
-})
+async function start() {
+  await ensureData()
+  server.listen(PORT, HOST, () => {
+    console.log(`CC Mallorca escoltant a http://${HOST}:${PORT} (dades: ${DATA_DIR})`)
+  })
+}
+
+const setPwdIdx = process.argv.indexOf('--set-password')
+if (setPwdIdx !== -1) {
+  const nueva = process.argv[setPwdIdx + 1]
+  if (!nueva) {
+    console.error('Us: node server.js --set-password NOVA_CONTRASENYA')
+    process.exit(1)
+  }
+  setPasswordAndExit(nueva).catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
+} else {
+  start().catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
+}

@@ -39,11 +39,13 @@ Passenger se reinicie solo en cada despliegue).
 ### 3. Crear la app Node con Setup Node.js App
 
 **Software → Setup Node.js App → Create Application**:
-- **Node.js version**: la más reciente disponible (18+)
+- **Node.js version**: la más reciente disponible; el código está escrito
+  en CommonJS puro y probado desde **Node 11 en adelante**, así que
+  funciona aunque el hosting solo ofrezca versiones antiguas
 - **Application mode**: Production
 - **Application root**: `repositories/ccmallorca-web`
 - **Application URL**: el subdominio `beta.ccmallorca.net`
-- **Application startup file**: `server.mjs`
+- **Application startup file**: `server.js`
 - **Environment variables**:
   - `CCM_DATA_DIR` = una ruta **fuera** de `repositories/`, por ejemplo
     `/home/TU_USUARIO/ccmallorca-data` (así el contenido y las fotos que
@@ -134,7 +136,7 @@ Node.js App** y reiniciando — pero eso solo aplica en la primera instalación
 Para cambiarla en caliente hace falta ejecutar:
 
 ```bash
-CCM_DATA_DIR=/ruta/a/ccmallorca-data node server.mjs --set-password NUEVA
+CCM_DATA_DIR=/ruta/a/ccmallorca-data node server.js --set-password NUEVA
 ```
 
 y reiniciar la app (botón "Restart" en Setup Node.js App, o

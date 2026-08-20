@@ -31,7 +31,7 @@ Type=simple
 User=$SERVICE_USER
 Environment=CCM_PORT=$PORT
 Environment=CCM_DATA_DIR=$DATA_DIR
-ExecStart=$NODE_BIN $HERE/server.mjs
+ExecStart=$NODE_BIN $HERE/server.js
 Restart=on-failure
 RestartSec=2
 
@@ -46,7 +46,7 @@ sleep 1
 # Contrasenya d'edicio
 if [ -n "$PASSWORD" ]; then
   echo "==> Establint la contrasenya d'edicio"
-  CCM_DATA_DIR="$DATA_DIR" "$NODE_BIN" "$HERE/server.mjs" --set-password "$PASSWORD"
+  CCM_DATA_DIR="$DATA_DIR" "$NODE_BIN" "$HERE/server.js" --set-password "$PASSWORD"
   sudo systemctl restart ccmallorca
   sleep 1
 fi

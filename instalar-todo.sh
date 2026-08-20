@@ -43,7 +43,7 @@ Type=simple
 User=$SERVICE_USER
 Environment=CCM_PORT=$PORT
 Environment=CCM_DATA_DIR=$DATA_DIR
-ExecStart=$NODE_BIN $HERE/server.mjs
+ExecStart=$NODE_BIN $HERE/server.js
 Restart=on-failure
 RestartSec=2
 
@@ -56,7 +56,7 @@ sleep 1
 ok "servei ccmallorca actiu"
 
 step "3/6 · Establint la contrasenya d'edicio"
-CCM_DATA_DIR="$DATA_DIR" "$NODE_BIN" "$HERE/server.mjs" --set-password "$PASSWORD" >/dev/null
+CCM_DATA_DIR="$DATA_DIR" "$NODE_BIN" "$HERE/server.js" --set-password "$PASSWORD" >/dev/null
 ok "contrasenya: $PASSWORD"
 
 # ------------------------------------------------- 4. contingut real de la web
