@@ -1,0 +1,11 @@
+{
+  "name": "ccmallorca",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Web de CC Mallorca amb editor tipus FrontPage",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs"
+  }
+}

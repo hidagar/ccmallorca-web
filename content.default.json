@@ -1,0 +1,274 @@
+{
+  "site": {
+    "title": "CC Mallorca",
+    "subtitle": "Corpus Cavernario Mayoricense",
+    "footer": "CC Mallorca · J. A. Encinas · Pollença, Mallorca",
+    "email": "jaencinas.ccmallorca@gmail.com",
+    "telefon": "",
+    "adreca": "Pollença, Mallorca"
+  },
+  "menu": [
+    { "slug": "inicio", "label": "Principal" },
+    { "slug": "articulos", "label": "Artículos" },
+    { "slug": "reportajes", "label": "Reportajes" },
+    { "slug": "informes", "label": "Informes" },
+    { "slug": "opinion", "label": "Opinión" },
+    { "slug": "mapa-del-web", "label": "Mapa del web" }
+  ],
+  "pages": {
+    "inicio": {
+      "title": "La exploración del Pou d'en Sureda",
+      "intro": "<p>Documentación de cavidades, yacimientos y hallazgos del archipiélago balear, a cargo de J. A. Encinas.</p>",
+      "blocks": [
+        {
+          "id": "inicio-foto",
+          "type": "image",
+          "src": "",
+          "alt": "Fotografía de portada del sitio",
+          "caption": ""
+        },
+        {
+          "id": "inicio-nota-h",
+          "type": "heading",
+          "text": "Página pendiente de trasladar"
+        },
+        {
+          "id": "inicio-nota",
+          "type": "text",
+          "html": "<p>Esta es la página principal del sitio. Todavía no se ha importado su contenido real de la web anterior — en cuanto se envíe el archivo <em>principal.htm</em> (o <em>index.htm</em>) se sustituirá este texto por el original.</p><p>Mientras tanto, puedes escribir aquí directamente usando el editor: pulsa \"Editar la web\" al pie de la página.</p>"
+        }
+      ]
+    },
+    "articulos": {
+      "title": "A propósito de la extinción holocénica del rupicáprido balear del género Myotragus",
+      "intro": "<p>Sobre la extinción del rupicáprido del archipiélago balear (España), descrito en 1909 por la paleontóloga inglesa D. Bate. Por J. A. Encinas S.</p>",
+      "blocks": [
+        {
+          "id": "articulos-foto-1",
+          "type": "image",
+          "src": "",
+          "alt": "Fotografía del yacimiento (FotoRamirez.jpg)",
+          "caption": ""
+        },
+        {
+          "id": "articulos-resumen-h",
+          "type": "heading",
+          "text": "Resumen"
+        },
+        {
+          "id": "articulos-resumen",
+          "type": "text",
+          "html": "<p>En orden a lo tratado bibliográficamente hasta ahora sobre la especie endémica de <em>Myotragus balearicus</em> Bate y su biogeografía, propia del archipiélago balear (España) en momentos previos al calcolítico continental, aquí se analizan las circunstancias que pudieron dar lugar a las sucesivas especies del género hasta acabar en la extinción, sin necesariamente mediar condiciones extraordinarias o catastróficas. Para ello el mamífero artiodáctilo se limitó a seguir la deriva evolutiva conforme al propio entorno natural, en lento y sutil cambio permanente, adaptándose a las características de los forrajes de los prados donde se alimentó.</p>"
+        },
+        {
+          "id": "articulos-summary-h",
+          "type": "heading",
+          "text": "Summary"
+        },
+        {
+          "id": "articulos-summary",
+          "type": "text",
+          "html": "<p><em>In order to what has been treated bibliographically up to now about the endemic species of Myotragus balearicus Bate and its biogeography, typical of the Balearic archipelago (Spain) in moments prior to the continental Chalcolithic, here we analyze the circumstances that could give rise to the successive species of the genus up to end in extinction, without necessarily mediating extraordinary or catastrophic conditions. For this, the artiodactyl mammal limited itself to following the evolutionary drift, according to its natural environment, in slow and subtle permanent change, trying to adapt to the characteristics of the forages of the meadows where it fed.</em></p>"
+        },
+        {
+          "id": "articulos-cuerpo-h",
+          "type": "heading",
+          "text": "El hábitat del rupicáprido"
+        },
+        {
+          "id": "articulos-cuerpo-1",
+          "type": "text",
+          "html": "<p>La general distribución ósea de la terminal especie extinta del <em>Myotragus balearicus</em> Bate por la isla mediterránea de Mallorca acredita un hábitat afrontado desde la capacidad del rupicáprido para fundamentalmente aprovechar forrajerías <em>córsicas</em> donde las herbáceas ya sufrían lento pero intenso proceso natural regresivo, al tiempo de proliferación transgresiva de gramíneas como la caña (<em>canya: Arundo donax</em> L.), el cañizo (<em>canyís / canyet: Phragmites australis</em> Cav. <em>sp.</em>) y la carcera o <em>carex</em> (<em>càrritx: Ampaleodesmos mauritanicus</em> P.). Las dos primeras aún hoy plantas dominantes de humedales marismeños y cauces ribereños, mientras la tercera resiste confinada en los roquedales calcáreos, formando las grandes atochas donde actualmente polulan, cada vez menos, las cabras asilvestradas; mayormente confinadas en las cresterías serranas, profundos barrancos y acantilados del litoral marino.</p><p>El evolucionado incisivo de crecimiento continuo en la mandíbula inferior del <em>Myotragus balearicus</em> explica el porqué de la paulatina desaparición de la serie de incisivos contrariamente propios en las cabras (<em>Capra aeagrus hircus</em>)* frecuentadoras de las pasterías de herbáceas y más reacias a alimentarse del <em>càrritx, carex o Ampaleodesmos</em>, salvo cuando las periódicas quemas pastoriles fuerzan tras el incendio el renuevo anual de la planta. Inveterada tradición mallorquina que, hasta hace poco, permitía alimentar los rebaños sueltos en las montañas, fuera de las confinadas praderías artificiales de laboreo agropecuario y que fueron creadas muy avanzado el tercer milenio antes de nuestra Era. Primitiva actividad antrópica ajena por consiguiente a la llegada de los primeros aborígenes al archipiélago balear.</p><p>Porque la selvática impenetrable maleza del Quercus y su asociación característica tiende a cubrir el suelo ahogando las herbáceas, recurso alimenticio de los cápridos y los ovinos. De modo que solo bóvidos y equinos no se ven afectados por el problema, al disponer de forma natural de las arduas gramíneas del cañizal y de la carcera o <em>càrritx</em>. Para ello <em>Myotragus balearicus</em> Bate desarrolla su largo incisivo; especie de \"uña\" útil para alcanzar la base del denso matojo, cortar cada hoja y hacer en el hueco del arco mandibular la bola alimenticia propia del rumiante. Capacidad ajena a las cabras y que, al aprovechar indiscriminada parte de la gramínea**, el animal se ve en el tórrido verano insular necesitado del agua que facilite la digestión y evitar morir de sed e inanición.</p><p>Son los fitolitos de la gramínea en cuestión (C. G. Ehrenberg, 1854), y específicamente los calcifitolitos, más que los silicolitos de las plantas ribereñas y las charcas, los que confieren al vegetal su recia, férrea y alzada estructura; causa del crecimiento continuo del gran incisivo en el animal, por la dificultad de alcanzar y cortar el tierno tallo más cercano a la broza inmediata al suelo. Cuando todavía no existían las periódicas quemas de la actividad pastoril y la selvática maleza casi todo lo dominaba.</p><p>En cuanto a la controvertida inferencia taxonómica de <em>Myotragus</em>, Nesogoral, Gallogoral y Takin, no hace demasiado tiempo (M. Zhou, 2019) que los análisis de ADN mitocondrial descartan que <em>capra</em> esté más cerca de Ovis, como en efecto ocurre con el Takin del Himalaya, en <em>Budarcas taxicolor</em> tibetana. <em>Bovidae</em> rupicáprido por consiguiente, frecuentador de altitudes incluso superiores a los 4500 metros, entre encajados barrancos, grandes valles y altas cresterías. Con peso corporal mayor a los 300 Kilos en los adultos y ahora en peligro de extinción.</p><p>La conclusión provisional pertinente es que esta familia de bóvidos euroasiáticos pudo evolucionar en los grandes humedales donde, en principio, dominaron las herbáceas y arbustivas de corto alcance, además de las gramíneas en determinados nichos ecológicos y donde terminaría confinado el pequeño dragón balear o tragón que así denominó D. Bate en 1909, el extinto <em>Myotragus baleáricus</em>.</p>"
+        },
+        {
+          "id": "articulos-notas",
+          "type": "text",
+          "html": "<p style=\"font-size:.9em\">* En situación de crecimiento normal del <em>càrritx</em>, a las cabras les resulta complicado alimentarse con él; si no media la intervención de la periódica tradicional quema del pastizal y el tierno rebrote tras las primeras lluvias de otoño. De hecho muy pocas veces los altos tallos verdes de la planta se ven comidos por ellas y cuando lo hacen, movidas en verano por la sed, acaban con graves problemas digestivos. Motivo por el cual es habitual hallar cabras muertas en el interior de covachas, con la barriga inchada, repleta del indigesto pasto de gramínea con tan alta proporción de fitolitos.</p><p style=\"font-size:.9em\">** Al especializarse <em>Myotragus</em> en la por entonces abundantes extensiones de la carcera (el <em>carex</em> o <em>càrritx</em>), a falta de las ya regresivas herbáceas, la especie inicia gran proliferación; para más adelante empezar también a escasear la típica atocha / <em>a-tossa</em> de los parajes <em>córsicos</em>, al quedar estos subsumidos en la intrincada vegetación leñosa. Tal y como actualmente está en parte ocurriendo incluso en las praderas artificiales formadas durante dos milenios por la actividad agropecuaria humana, quema de montes, talas de bosques y radical transformación del territorio.</p>"
+        },
+        {
+          "id": "articulos-biblio-h",
+          "type": "heading",
+          "text": "Bibliografía"
+        },
+        {
+          "id": "articulos-biblio",
+          "type": "text",
+          "html": "<p style=\"font-size:.9em\">- H. L. R. Betoldi de Pomar (1970a): Fitolitos y zoolitos. Su significado geológico en sedimentos continentales. Asociación Geológica de Córdoba (Argentina), Boletín 1(1): 21-31.<br>- Ehrenberg, C. G. 1854. Mikrogeologie. 2 Vol. 374 pag. L. Voss. Leipzig.<br>- ENCINAS, J. A. i ALCOVER, J. A.,1997: El jaciment fossilifer de la Cova Estreta (Pollença, Mallorca). Endins, 21. Palma de Mallorca.<br>- ENCINAS, J. A. 2014: Corpus cavernario mayoricense (Pollença, Mallorca). Editorial El Gal, 1355 págs. y Anexo al CCM, wwwccmallorca.net /informes, año 2022, 272 págs. Pollença, Mallorca.<br>- Guérin C., 1965: Gallogoral (nov. Gen.) Milanese (Rütimeyer, 1878) un rupicapriné du Villafranchien de Europa occidental. Documents des Laboratoires de Géologie de la Faculte des Sciences de Lyon, 11, 353 pp.<br>- Qian M, Dou Z, Gu YX, Zhang Q, Lu RL, Zhu XL. Cloning and analysis of highly repetitive sequence fragments from takin (Budorcas taxicolor). Shi Yan Sheng Wu Xue Bao. 2002 Mar;35(1):36-41.<br>- Zhou M, Yu J, Li B, Ouyang B, Yang J., 2019 The complete mitochondrial genome of Budorcas taxicolor tibetana (Artiodactyla: Bovidae) and comparison with other Caprinae species. Int J. Biol Macromol; 121: 223-232.</p><p style=\"font-size:.9em\">Pollença (Mallorca), 30.03.2022</p>"
+        }
+      ]
+    },
+    "reportajes": {
+      "title": "Avenc des Forasters",
+      "intro": "<p>Evidencias de su más antigua exploración.</p>",
+      "blocks": [
+        {
+          "id": "reportajes-nota-h",
+          "type": "heading",
+          "text": "Página pendiente de trasladar"
+        },
+        {
+          "id": "reportajes-nota",
+          "type": "text",
+          "html": "<p>Esta sección del sitio original recoge reportajes de exploración, incluido uno sobre el <em>Avenc des Forasters</em> y evidencias de su exploración más antigua. Todavía no se ha importado su contenido real — en cuanto se envíe el archivo <em>reportajes.htm</em> se sustituirá este texto por el original.</p>"
+        }
+      ]
+    },
+    "informes": {
+      "title": "Informes y anexos del Corpus Cavernario Mayoricense",
+      "intro": "<p>Documentos técnicos y anexos del Corpus Cavernario Mayoricense.</p>",
+      "blocks": [
+        {
+          "id": "informes-nota-h",
+          "type": "heading",
+          "text": "Página pendiente de trasladar"
+        },
+        {
+          "id": "informes-nota",
+          "type": "text",
+          "html": "<p>Esta sección del sitio original enlaza documentos en formato PDF, como los anexos del Corpus Cavernario Mayoricense. Todavía no se ha importado el texto real de <em>informes.htm</em> — en cuanto se envíe, se sustituirá este texto por el original.</p>"
+        },
+        {
+          "id": "informes-doc-anexos-2023",
+          "type": "document",
+          "src": "",
+          "label": "Anexos al Corpus Cavernario Mayoricense, Año 2023"
+        },
+        {
+          "id": "informes-doc-actualizaciones-2021",
+          "type": "document",
+          "src": "",
+          "label": "Actualizaciones CORPUS 2021"
+        }
+      ]
+    },
+    "opinion": {
+      "title": "Aproximación cristalográfica a los hábitos espeleotemáticos en las cavernas de Mallorca (parte 1ª)",
+      "intro": "<p>Por J. A. Encinas, Pollença (Mallorca).</p>",
+      "blocks": [
+        {
+          "id": "opinion-foto-1",
+          "type": "image",
+          "src": "",
+          "alt": "Fotografía de espeleotemas (DaniEstrel.jpg)",
+          "caption": ""
+        },
+        {
+          "id": "opinion-texto-1",
+          "type": "text",
+          "html": "<p>Entre ordenamiento taxonómico y tabla periódica cabría organizar los denominados espeleotemas, en función del proceso conformativo de los sistemas cristalinos, los ejes de su geometría espacial, metales, metaloides, materia orgánica y/o tierras que la condicionan, el medio ambiente en que se generan, las particularidades atmosféricas, las cargas electromagnéticas que las posibilitan y el comportamiento de los iones en la disolución durante la denudación de coloides nucleicos y demás microscópicos detritos; en esencia origen de la eclosión cristalográfica.</p><p>De los muy diversos tipos de cristal y distintas morfologías, las socorridas denominaciones populares tratan de acercarse a diferenciarlas mediante inadecuada vulgarización, con improvisados epítetos figurativos, en función de los hábitos; se trate de aspectos aparentes, aglutinaciones aciculares o bien placoides y cúmulos tabulares.</p><p>En la etimología de \"cristal\" su radical indoeuropeo <em>kreus-</em> significa \"frío\", hielo a partir del agua (dendritas estelares en los copos de nieve), elemento fundamental en la creación estructural del polígono hexagonal básico y en cuyos apéndices se dispara el reproductivo crecimiento fractal, reorganizando las moléculas de hidrógeno y oxígeno, compartiendo electrones. Cristales característicos del agua. Costra, corteza, cresta (griego <em>cristallus</em>, latín <em>crista</em>) y de donde \"cristal\"; pero no vidrio.</p><p>Porque \"vidrio\" se tiene por \"ver al través\", latino <em>vitreum &lt; vitreus</em>; a partir del radical indoeuropeo <em>weid-</em> (vídeo, visión, etc.) y se correspondería con la acción y efecto de vitrificar; si bien H. Pingarón (<em>etimologias.dechile.net/vidrio</em>) advierte que en realidad el concepto se refiere al primitivo color levemente azulado (celeste, cerúleo, también algo verdoso) de los translúcidos abalorios prehistóricos; creados por los fenicios del delta nilótico egipcio y Oriente Medio, en su momento materiales teñidos mediante sulfato de cobre (de donde se obtiene <em>vitreolus</em>, el vitriolo ácido sulfúrico), en función de la ancestral tradición femenina de embellecerse con el glasto, la planta del <em>vitrum (Isatis tinctoria)</em>; una crucífera de cuyas hojas se obtenía pigmento análogo al añil y con el cual se embadurnaban el cuerpo y también resaltaban la belleza de los ojos.</p><p>Ciertamente, el vidrio materia cerámica amorfa organiza las moléculas de forma irregular; mientras el cristal lo hace conforme a estructura regular. Ahora bien, la tradición metalúrgica insular apenas distinguía entre <em>vidre</em> y <em>vernís</em>, seguramente debido al origen paleosemítico de ambos términos y su directa relación con el color verde del cobre tan tempranamente utilizado en esmaltes, cerámicas, cristales* y embarnizados.</p>"
+        },
+        {
+          "id": "opinion-foto-2",
+          "type": "image",
+          "src": "",
+          "alt": "Fotografía de espeleotemas (Julie I.jpg)",
+          "caption": ""
+        },
+        {
+          "id": "opinion-texto-2",
+          "type": "text",
+          "html": "<p>Como al bajar la temperatura en las moléculas del agua la bipolaridad estructural entre la diferente electronegatividad del oxígeno y la del hidrógeno se aglutinan en placas hexagonales, cualquier elemento disuelto en el líquido tiende a adaptarse a su carácter poligonal, especialmente en el caso de los carbonatos. De modo que la sucesión de tales cristales dendríticos acumulan volúmenes cuya direccionalidad está en función del medio ambiente donde se generan; aunque siguiendo ejes en buena parte condicionados por la aleatoriedad de la denudación coloidal. Sea ésta aportada por la fluencia hídrica o bien se trate de coloides depositados por el polvo atmosférico, los desprendimientos detrítico cenitales, las corrientes de aire y bacterias. Hasta que excesivo crecimiento, peso, erosión hídrica y/o corrosión hidrocarbónica ataca la morfología y puede acabar incluso por destruirla totalmente.</p><p>La fuerza de cohesión en los cristales espeleotemáticos, debida a las interacciones electromagnéticas de atracción y repulsión (J. D. Van der Valls, 1923) de los enlaces intermoleculares, sufren contingentes variaciones influenciadas por la propia proximidad de las otras conexiones del complejo y los campos magnéticos que pueden estar afectando a toda o bien parte de la estructura. Por lo común produciendo las características espículas del hielo y los copos de nieve, en función del intercambio energético entre el estado calórico de los iones y el inmediato medio atmosférico más frío, donde se produce el evento. Calor que al liberarse inhibe nueva cristalización y así sucesivamente. Siendo Ukichiro Nakaya (1954: \"Snow Crystals...\" ISBN 9780674182769, 510 págs. Harvard University Press) quien limita a cuatro diferencias esenciales la forma organizativa de los cristales del agua: placas, agujas y prismas, placas dendríticas y vainas; con específicas formas prismáticas macizas y prismáticas huecas. Estas últimas generadas con bajo índice de saturación hídrica.</p><p>Los griegos se referían al cuarzo como <em>crustallos</em>, es decir <em>kroos-tal-los</em> (\"gota fría\"), cristal, en vulgar román paladino \"carámbanos de hielo\" o cualquier otro elemento asimilable, como las estalactitas. <em>K(a)ramu-anos / caramu(v&lt;b)anos</em> relativo a cúmulo cristalino, catalán <em>caramulla</em>, excrescencia; latín <em>caramellus / calamelus</em> en cuanto caña dulce o de miel.</p><p>En esta cuestión cristalográfica se dan distintas composiciones para una misma morfología, conforme al conocido caso químico de la calcita y el aragonito. Entre el calcio y la dolomita similitud solamente diferenciable por el magnesio contenido en esta segunda. También produciéndose la conocida singularidad del diamante, carbono puro como el grafito, los carbones y el hollín. Alotropía (Berzelius, 1841) del carbono que hace posible diversas variantes estructurales.</p><p>D. Gratet de Dolomien (1791) se fija en las materias contaminantes que, penetrando en el paquete cristalino, les permite acoplarse como si fueran puras y aportando, mediante el agente colorante o los pigmentos en los minerales alocromáticos, la tonalidad al cristal.</p><p>Siendo el agua cálida el principal disolvente en la espeleotemática calcítica, por lo general introducida en el subsuelo durante el verano, cuando la temperatura del terreno es más alta y las corrientes de convección subterránea calientan las rocas internas y la atmósfera de las cavernas. Después en invierno, al invertirse el proceso se enfría el sistema y en buena medida reactiva los fenómenos de cristalización hipogeica, pero no necesariamente los latentes procesos hipogénicos.</p><p style=\"font-size:.9em\">* Está acreditado el significado de \"cristal\" en el sentido de <em>chriō</em> y <em>cristus</em> (Eurípides, siglo V antes de Cristo), referido a la costumbre prehistórica de untarse el cuerpo con un aceite resinoso para protegerlo y embellecerlo. Luego recurso habitual en anacoretas y ermitaños que, prácticamente al desnudo, solían vivir en solitario. Barniz de santidad (sánscrito <em>varnika</em>, pintura; latín <em>veronicis</em>, griego <em>veronik, vernís</em> del catalán) generador de la aureola \"divina\" al evaporar y resecarse la sustancia o cristalizar en el cuerpo del santón.</p><p style=\"font-size:.9em\">J. A. Encinas, Pollença (Mallorca), 4.04.2022</p>"
+        },
+        {
+          "id": "opinion-foto-3",
+          "type": "image",
+          "src": "",
+          "alt": "Fotografía de espeleotemas (Dani I.jpg)",
+          "caption": ""
+        },
+        {
+          "id": "opinion-foto-4",
+          "type": "image",
+          "src": "",
+          "alt": "Fotografía de espeleotemas (JulieCol.jpg)",
+          "caption": ""
+        },
+        {
+          "id": "opinion-foto-5",
+          "type": "image",
+          "src": "",
+          "alt": "Fotografía de espeleotemas (DaniDents.jpg)",
+          "caption": ""
+        }
+      ]
+    },
+    "mapa-del-web": {
+      "title": "Es Calderers, Minas de Binifarda, Es Soldats y demás",
+      "intro": "<p>Nuevos aspectos documentadores. Por J. A. Encinas.</p>",
+      "blocks": [
+        {
+          "id": "mapa-foto-calderers",
+          "type": "image",
+          "src": "",
+          "alt": "Monumento naviforme de Es Calderers (CalderersJer.jpg)",
+          "caption": ""
+        },
+        {
+          "id": "mapa-texto-1",
+          "type": "text",
+          "html": "<p>Como si se tratara de barca enfilando la proa hacia el reguero de la cañada, este monumento naviforme de la temprana Edad del Bronce balear tiene en la finca de <em>Es Calderers</em> (Sant Joan) acreditado testimonio funerario de hordas pastoriles radicadas en aquella extensa majada. C. Veny la publicó en 1968 (B. P. H., IX, Madrid) mediante croquis planimétrico, sin haber alcanzado a ver el fondo de tierra, las espinas compartimentales de sus células propias de enterramientos de segundo grado, ni poder apreciar el carácter plenamente natural del hipogeo; excepción hecha del somero ahondado artificial de las rocas del suelo, excavado con el propósito de diferenciar el cubículo absidal del resto de la nave y su ínfimo corredor deambulante. El mismo surco drenante hacia fuera, alargado ligeramente discordante respecto al eje del resto de la cueva (506595 4382730 185 CCM 02 I Cazn), más allá del escaso <em>dromos</em> de la angosta embocadura.</p>"
+        },
+        {
+          "id": "mapa-foto-calderera-ded",
+          "type": "image",
+          "src": "",
+          "alt": "Detalle de Es Calderers (CalderaDed.jpg)",
+          "caption": ""
+        },
+        {
+          "id": "mapa-texto-2",
+          "type": "text",
+          "html": "<p>El autor de estas notas documentadoras señala, en la imagen fotográfica captada por C. Jerónimo, los dos más inferiores niveles inundatorios del antiguo lucillo de aguas <em>córsicas</em>. El más moderno y hondo obedece en realidad a la obstrucción accidental del reguero de la entrada, debido a la caída en el interior de tierras y materia orgánica; mientras el del color de la verdina indica el máximo nivel del encharque interno, consecuencia de las filtraciones pluviales indicada en la segunda imagen o central, casi a nivel de la juntura interestratigráfica del cubículo absidal. De modo que la conformación del subterráneo se iría formando conforme progresivamente se encajaba el drenaje, en duros materiales margo-calizos, dolomíticos y silíceos.</p>"
+        },
+        {
+          "id": "mapa-foto-mina-estrat",
+          "type": "image",
+          "src": "",
+          "alt": "Estratigrafía de la mina (MinaEstratJer.jpg)",
+          "caption": ""
+        },
+        {
+          "id": "mapa-texto-3",
+          "type": "text",
+          "html": "<p>De la fotografía de arriba a la izquierda puede apreciarse el adintelado estructural interno en el macizo y el escaso laboreo regularizador del hipogeo en la cúpula y las paredes. Signos de identidad que sugieren cronología propia de la transición entre el <em>Pretalaiótico</em> y el <em>Talaiótico</em>.</p><p>En Sant Joan se ha podido acceder a otras cavidades de aproximadamente el mismo periodo, necesitándose en algunas de ellas las preceptivas tareas de limpieza a cargo de los correspondientes facultativos. No es el caso de la <strong>Cova Minera de Binifarda</strong> y las otras de los alrededores, intensamente explotadas en su momento para la extracción de minerales, gravas, tierras raras, pigmentos, piedras y recursos para producir cal y cemento natural, además del estiércol animal acumulado durante siglos en el interior, útil para el abono de los huertos cercanos. Con el recurso fueron desapareciendo los restos arqueológicos contenidos en tales cavernas. A veces esparcidos en las tierras de labor, como solía ser habitual.</p>"
+        },
+        {
+          "id": "mapa-foto-binifarda",
+          "type": "image",
+          "src": "",
+          "alt": "Interior de la mina de Binifarda (BinifardaTrict.jpg)",
+          "caption": ""
+        },
+        {
+          "id": "mapa-texto-4",
+          "type": "text",
+          "html": "<p>La mina mayor de <em>Binifarda</em> (vid. el PDF en el anexo de 2023, SJo. M.01) fue en parte sometida a continuados procesos extractivos, a lo largo de siglos, hasta finalmente iniciarse el recurso de explotación al aire libre, cuando ya el yacimiento estaba prácticamente agotado. Para ello se provocaban controlados colapsos cupulares y el relleno en retroceso de las galerías improductivas, a fin de garantizar la seguridad del resto, evitando de paso el excesivo volumen de las escombreras. Probablemente en épocas prehistóricas en el sitio se produjo cobre (según acreditan las escorias de fundición detectadas en los alrededores), cinc, algo de hierro, azufre y plomo.</p>"
+        },
+        {
+          "id": "mapa-foto-nivel",
+          "type": "image",
+          "src": "",
+          "alt": "Nivel de agua en la cueva (Nivel.jpg)",
+          "caption": ""
+        },
+        {
+          "id": "mapa-texto-5",
+          "type": "text",
+          "html": "<p>Bajo las acantiladas peñas del <em>Puig de Sant Nofre</em> se inició una exploración prospectiva de sulfuros, actualmente enclave conocido como <em>Cova des Soldats</em> (PDF, anexo 2023), perforando la base del farallón a partir de lo que fue acogedor abrigadero prehistórico y el cual acaba destruido al desprenderse la gran sección de rocas que formaba potente brecha traccional. Las peñas desprendidas rodaron ladera abajo, dejando en el suelo los triturados fragmentos de cerámica de cuando menos tres significativas épocas. Los vestigios más antiguos remontan el Bronce medio balear, entre tiestos <em>talaióticos</em> a base de cocción oxidante, evidencias de vasijas tardorromanas africanas de influencia bereber y determinados fragmentos de tradición musulmana.</p><p>Explícito nivel lagunar, o encharque pluvial interno, muestra en el actual frontil rocoso hasta donde alcanzaron las aguas, antes de hundirse su techo. Pero la corta galería conservada muestra claros indicios de haber sido remodelada y amplificada a base de barrenos y explosivos, a partir de reducto natural preexistente; quizá de tipo hipogeo funerario. Ignorándose de momento algo sobre el motivo de búsqueda que los supuestos soldados del nombre del antro pretendieron hallar dentro. A no ser que quisieran cercionarse sobre el origen del troceado mineral de cobre gris que se halla en la cumbre del mismo monte, donde las estructuras ciclópeas prehistóricas de arriba (dos bastiones torreados y muro cortina entre ambos, etc.), fueron mayormente destruidas por razias musulmanas. Demolido enclave defensivo más tarde utilizado para edificar ermita cristiana encima.</p><p>En el <em>Puig de Sant Nofre</em>, cerca de la linde intermunicipal de Sant Joan pero en el municipio de Petra, se encuentra la llamada <strong>Cova de sa Banyuda</strong>, pequeño abrigo de escasos metros de amplitud, similar medida en alzada interna y poco menos de fondo. Fue útil cubil rocoso donde criaron colmenas, su nombre parece indicar la culminación del serrallo, en cuanto alzado cuerno orográfico del sitio de Es Corb; en realidad cuerpo de guardia de la prehistórica fortificación de encima, entendida asta farallonera.</p>"
+        },
+        {
+          "id": "mapa-foto-libro",
+          "type": "image",
+          "src": "",
+          "alt": "Portada del libro Corpus Cavernario Mayoricense (LibCCM.jpg)",
+          "caption": ""
+        },
+        {
+          "id": "mapa-nota",
+          "type": "text",
+          "html": "<p>Referencia bibliográfica: ENCINAS, J. A. 2014: <em>Corpus Cavernario Mayoricense</em> (Pollença, Mallorca). Editorial El Gal, 1355 págs.</p>"
+        }
+      ]
+    }
+  }
+}

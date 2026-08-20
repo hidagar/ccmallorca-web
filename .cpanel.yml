@@ -1,0 +1,9 @@
+---
+# Nomes l'utilitza cPanel (Git™ Version Control -> Deploy HEAD Commit).
+# Toca un fitxer dins de tmp/ perque Passenger reinicii l'app Node
+# automaticament despres de cada desplegament (conveni estandard de
+# Phusion Passenger).
+deployment:
+  tasks:
+    - /bin/mkdir -p tmp
+    - /usr/bin/touch tmp/restart.txt

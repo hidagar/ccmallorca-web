@@ -1,0 +1,9 @@
+# Copia de la web original: la baixa el servidor amb mirror-original.sh.
+# Es pot pujar al repositori a ma si convé conservar-la.
+original/
+
+# Sortida de la prova d'importacio (node import-original.mjs --dry)
+content.imported.json
+
+# Informe de disseny generat per analizar-diseno.mjs --json
+diseno-original.json

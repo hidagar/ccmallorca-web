@@ -1,0 +1,351 @@
+/* CC Mallorca — estils de la web publica i del mode edicio */
+
+/* Paleta basada en la web original (fons negre, textos daurats/ambre i
+   caixes de contingut clares): mantenim la identitat pero amb un disseny
+   fluid i llegible. */
+:root {
+  --ink: #241f1a;
+  --ink-soft: #5c5347;
+  --bg: #0b0a09;
+  --bg-elevated: #18130f;
+  --paper: #faf6ec;
+  --paper-line: #e4dbc7;
+  --line: #3a3126;
+  --accent: #d7a34b;
+  --accent-soft: #f0cf8f;
+  --accent-dark: #a9762a;
+  --clay: #a9762a;
+  --edit: #b8860b;
+  --edit-bg: #fdf7e3;
+  --ok: #2f8f5b;
+  --err: #c0392b;
+  --radius: 10px;
+  --wrap: 1080px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--accent-soft);
+  font-family: Arial, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 18px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { width: 100%; max-width: var(--wrap); margin: 0 auto; padding: 0 20px; }
+
+img { max-width: 100%; height: auto; display: block; }
+
+a { color: var(--accent); }
+a:hover { color: var(--accent-soft); }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0;
+  background: var(--accent); color: #fff; padding: 12px 18px; z-index: 100;
+}
+.skip-link:focus { left: 0; }
+
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+/* ---------------------------------------------------------------- capçalera */
+
+.site-header {
+  background: linear-gradient(160deg, #100d0a 0%, var(--bg-elevated) 100%);
+  color: var(--accent-soft);
+  border-bottom: 4px solid var(--accent-dark);
+}
+
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding-top: 20px; padding-bottom: 20px;
+}
+
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-mark { color: var(--accent); display: flex; }
+.brand-text { display: flex; flex-direction: column; }
+.brand-title { font-size: 1.7rem; font-weight: 700; letter-spacing: .01em; line-height: 1.2; color: var(--accent); }
+.brand-subtitle { font-size: .95rem; color: #cbb98a; }
+
+.nav-toggle {
+  display: none; background: rgba(215,163,75,.14); color: var(--accent-soft);
+  border: 1px solid rgba(215,163,75,.4); border-radius: var(--radius);
+  padding: 10px 16px; font-size: 1rem; cursor: pointer; font-family: inherit;
+}
+
+.site-nav { background: #0d0b08; }
+.nav-list {
+  display: flex; flex-wrap: wrap; gap: 2px;
+  list-style: none; margin: 0; padding: 0 20px;
+}
+.nav-list a {
+  display: block; padding: 14px 18px; color: #cbb98a;
+  text-decoration: none; font-size: 1rem; border-bottom: 3px solid transparent;
+}
+.nav-list a:hover { background: rgba(215,163,75,.08); color: var(--accent-soft); }
+.nav-list a[aria-current="page"] {
+  color: var(--accent); border-bottom-color: var(--accent); background: rgba(215,163,75,.06);
+}
+
+/* ------------------------------------------------------------------ pagina */
+
+.page { padding: 32px 20px 64px; min-height: 50vh; }
+.loading { color: var(--accent-soft); padding: 0 20px; }
+
+/* Caixa de contingut clara, com feia la web original amb les seves
+   taules blanques, pero ara fluida i sense amplada fixa. */
+.page-inner {
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 14px;
+  border: 1px solid var(--paper-line);
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  padding: 32px clamp(20px, 5vw, 56px) 48px;
+}
+
+.page-title {
+  font-size: 2rem; line-height: 1.25; margin: 0 0 8px;
+  padding-bottom: 14px; border-bottom: 2px solid var(--paper-line);
+  color: var(--ink);
+}
+.page-intro { font-size: 1.1rem; color: var(--ink-soft); margin: 14px 0 34px; font-style: italic; }
+.page-intro p { margin: 0 0 10px; }
+
+.block { margin: 0 0 28px; }
+.block h2 {
+  font-size: 1.4rem; margin: 36px 0 12px; color: var(--accent-dark);
+}
+.block-text { color: var(--ink); }
+.block-text p { margin: 0 0 16px; text-align: justify; }
+.block-text ul, .block-text ol { margin: 0 0 16px; padding-left: 26px; }
+.block-text li { margin-bottom: 8px; }
+.block-text blockquote {
+  margin: 0 0 16px; padding: 12px 20px;
+  border-left: 4px solid var(--accent-dark); background: #f1e9d3; color: var(--ink-soft);
+}
+
+figure { margin: 0 0 28px; }
+/* Alçada limitada: aixi una foto petita o vertical no descuadra la pagina,
+   pugi el client el que pugi. */
+figure img {
+  width: 100%; border-radius: var(--radius);
+  border: 1px solid var(--paper-line); background: #f1ecdd;
+  max-height: 30rem; object-fit: contain;
+}
+figcaption { font-size: .95rem; color: var(--ink-soft); padding-top: 10px; }
+
+.photo-empty {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 220px; border: 2px dashed var(--paper-line); border-radius: var(--radius);
+  background: #f1ecdd; color: var(--ink-soft); text-align: center; padding: 20px;
+}
+
+.gallery {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.gallery figure { margin: 0; }
+.gallery img { aspect-ratio: 4 / 3; object-fit: cover; max-height: none; }
+.gallery-empty { grid-column: 1 / -1; }
+
+/* -------------------------------------------------------------------- peu */
+
+.site-footer {
+  background: var(--bg-elevated); color: #cbb98a;
+  margin-top: 40px; padding: 26px 0; font-size: .95rem;
+  border-top: 1px solid rgba(215,163,75,.25);
+}
+.footer-inner {
+  display: flex; flex-wrap: wrap; gap: 10px 20px;
+  align-items: center; justify-content: space-between;
+}
+.footer-text { margin: 0; }
+.footer-meta { margin: 0; display: flex; align-items: center; gap: 10px; }
+.site-footer a { color: var(--accent); }
+
+.edit-entry {
+  background: none; border: none; color: var(--accent);
+  font: inherit; cursor: pointer; text-decoration: underline; padding: 0;
+}
+.edit-entry:hover { color: var(--accent-soft); }
+
+/* --------------------------------------------------------------- mode edicio */
+
+body.editing { padding-top: 78px; }
+
+.editbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+  background: var(--edit-bg); border-bottom: 3px solid var(--edit);
+  box-shadow: 0 2px 10px rgba(0,0,0,.12);
+}
+.editbar-inner {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  align-items: center; justify-content: space-between; padding: 12px 20px;
+}
+.editbar-status { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.editbar-status .dot {
+  width: 12px; height: 12px; border-radius: 50%; background: var(--ok); flex: none;
+}
+.editbar-status.dirty .dot { background: var(--edit); }
+.editbar-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.btn {
+  font: inherit; font-weight: 600; cursor: pointer;
+  padding: 12px 22px; border-radius: var(--radius);
+  border: 2px solid transparent; background: #e8e2d5; color: var(--ink);
+}
+.btn:hover { filter: brightness(.96); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn-primary { background: var(--ok); border-color: var(--ok); color: #fff; }
+.btn-ghost { background: #fff; border-color: var(--line); }
+.btn-danger { background: #fff; border-color: var(--err); color: var(--err); }
+.btn-lg { padding: 15px 28px; font-size: 1.05rem; }
+
+/* Zones editables */
+body.editing [data-editable] {
+  position: relative;
+  outline: 2px dashed #c9b273;
+  outline-offset: 4px;
+  border-radius: 3px;
+  transition: outline-color .12s, background-color .12s;
+}
+body.editing [data-editable]:hover { outline-color: var(--edit); background: rgba(184,134,11,.06); }
+body.editing [data-editable]:focus {
+  outline: 3px solid var(--edit); background: #fffdf5;
+}
+body.editing [data-editable]:empty::before {
+  content: "Escribe aquí…"; color: #9a8f77;
+}
+
+body.editing .brand-title, body.editing .brand-subtitle, body.editing .footer-text {
+  outline-color: rgba(255,255,255,.5);
+}
+body.editing .brand-title:hover, body.editing .brand-subtitle:hover,
+body.editing .footer-text:hover { background: rgba(255,255,255,.12); }
+
+/* Botons sobre les fotos */
+.photo-wrap { position: relative; }
+.photo-actions {
+  position: absolute; inset: auto 10px 10px auto;
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;
+}
+.photo-btn {
+  font: inherit; font-size: .95rem; font-weight: 600; cursor: pointer;
+  background: rgba(255,255,255,.96); color: var(--ink);
+  border: 2px solid var(--ink); border-radius: var(--radius);
+  padding: 9px 14px; box-shadow: 0 2px 6px rgba(0,0,0,.25);
+}
+.photo-btn:hover { background: #fff; }
+.photo-btn.danger { border-color: var(--err); color: var(--err); }
+
+.gallery-add {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 165px; border: 2px dashed var(--edit); border-radius: var(--radius);
+  background: var(--edit-bg); color: var(--ink); font: inherit; font-weight: 600;
+  font-size: 1rem; cursor: pointer; text-align: center; padding: 16px;
+}
+.gallery-add:hover { background: #fbf2d8; }
+
+/* Documents PDF */
+.doc-wrap { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.doc-link {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: #f1ecdd; border: 2px solid var(--paper-line); border-radius: var(--radius);
+  padding: 14px 20px; text-decoration: none; color: var(--ink); font-weight: 600;
+  font-size: 1.05rem; transition: background-color .12s, border-color .12s;
+}
+.doc-link:hover { background: #ece4cd; border-color: var(--accent-dark); color: var(--ink); }
+.doc-icon { font-size: 1.6rem; }
+.doc-empty {
+  padding: 16px 20px; border: 2px dashed var(--paper-line); border-radius: var(--radius);
+  background: #f1ecdd; color: var(--ink-soft); font-size: 1rem;
+}
+.doc-label-input {
+  font: inherit; font-size: 1rem; padding: 10px 14px;
+  border: 2px solid var(--paper-line); border-radius: var(--radius);
+  width: 100%; max-width: 380px;
+}
+.doc-label-input:focus { border-color: var(--accent-dark); outline: none; }
+/* Els documents no tenen foto a sota: els botons van en flux normal,
+   no superposats com als blocs d'imatge. */
+.doc-wrap .photo-actions { position: static; inset: auto; justify-content: flex-start; }
+
+/* Barra de format flotant */
+.format-bar {
+  position: absolute; z-index: 70; display: none; gap: 4px;
+  background: #fff; border: 2px solid var(--ink); border-radius: var(--radius);
+  padding: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.22);
+}
+.format-bar.visible { display: flex; }
+.format-bar button {
+  font: inherit; font-size: 1rem; min-width: 40px; height: 38px;
+  border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer;
+}
+.format-bar button:hover { background: var(--paper); }
+
+/* Dialegs */
+.overlay {
+  position: fixed; inset: 0; z-index: 90;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(20,26,33,.55); padding: 20px;
+}
+.dialog {
+  background: #fff; border-radius: 14px; padding: 28px;
+  width: 100%; max-width: 460px; box-shadow: 0 14px 40px rgba(0,0,0,.3);
+}
+.dialog h2 { margin: 0 0 8px; font-size: 1.4rem; }
+.dialog p { margin: 0 0 18px; color: var(--ink-soft); }
+.dialog label { display: block; font-weight: 600; margin-bottom: 8px; }
+.dialog input[type="password"], .dialog input[type="text"] {
+  width: 100%; font: inherit; padding: 13px 14px;
+  border: 2px solid var(--line); border-radius: var(--radius); margin-bottom: 8px;
+}
+.dialog input:focus { border-color: var(--accent); outline: none; }
+.dialog-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+.dialog-error { color: var(--err); font-weight: 600; min-height: 1.5em; margin: 0 0 6px; }
+
+/* Avisos */
+.toast {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+  z-index: 95; background: var(--ink); color: #fff;
+  padding: 14px 24px; border-radius: 999px; font-weight: 600;
+  box-shadow: 0 6px 20px rgba(0,0,0,.3); max-width: 90vw; text-align: center;
+}
+.toast.ok { background: var(--ok); }
+.toast.err { background: var(--err); }
+
+.help-note {
+  background: var(--edit-bg); border: 1px solid #e3d5a8;
+  border-left: 4px solid var(--edit); border-radius: var(--radius);
+  padding: 16px 20px; margin: 0 0 30px;
+}
+.help-note h2 { margin: 0 0 8px; font-size: 1.1rem; }
+.help-note ul { margin: 0; padding-left: 22px; }
+.help-note li { margin-bottom: 5px; }
+
+/* ------------------------------------------------------------------ mòbil */
+
+@media (max-width: 760px) {
+  body { font-size: 17px; }
+  .nav-toggle { display: block; }
+  .site-nav { display: none; }
+  .site-nav.open { display: block; }
+  .nav-list { flex-direction: column; padding: 6px 20px 14px; }
+  .nav-list a { padding: 13px 10px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .nav-list a[aria-current="page"] { border-bottom-color: var(--clay); }
+  .page-title { font-size: 1.7rem; }
+  .brand-title { font-size: 1.4rem; }
+  .editbar-inner { padding: 10px 16px; }
+  .btn { padding: 11px 16px; }
+  body.editing { padding-top: 118px; }
+}
+
+@media print {
+  .site-nav, .site-footer, .editbar, .photo-actions, .nav-toggle, .skip-link { display: none !important; }
+  body { font-size: 12pt; }
+  .site-header { background: none; color: #000; }
+}
