@@ -414,7 +414,18 @@ function stripBasePath(pathname) {
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost')
-  const pathname = stripBasePath(decodeURIComponent(url.pathname))
+  const rawPathname = decodeURIComponent(url.pathname)
+
+  // Sense la barra final (p. ex. /beta en lloc de /beta/), el navegador
+  // resol malament els fitxers relatius (styles.css, app.js...) perque
+  // els busca com si fossin germans de "beta" a l'arrel. Redirigim per
+  // corregir la URL de la barra d'adreces abans de servir res.
+  if (BASE_PATH && rawPathname === BASE_PATH) {
+    res.writeHead(301, { Location: BASE_PATH + '/' + url.search })
+    return res.end()
+  }
+
+  const pathname = stripBasePath(rawPathname)
 
   try {
     // --- API ---
