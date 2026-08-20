@@ -398,9 +398,23 @@ function readBody(req) {
 
 // ------------------------------------------------------------------ servidor
 
+// Si l'app es serveix des d'un subdirectori (p. ex. ccmallorca.net/beta en
+// lloc d'un subdomini propi), cal saber-ho per treure el prefix de la ruta.
+// No sabem si Passenger ja el treu abans d'arribar aqui, aixi que ho fem
+// nosaltres tambe: si CCM_BASE_PATH no hi es, no canvia res (comportament
+// identic al d'abans).
+const BASE_PATH = String(process.env.CCM_BASE_PATH || '').replace(/\/+$/, '')
+
+function stripBasePath(pathname) {
+  if (!BASE_PATH) return pathname
+  if (pathname === BASE_PATH) return '/'
+  if (pathname.indexOf(BASE_PATH + '/') === 0) return pathname.slice(BASE_PATH.length)
+  return pathname
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost')
-  const pathname = decodeURIComponent(url.pathname)
+  const pathname = stripBasePath(decodeURIComponent(url.pathname))
 
   try {
     // --- API ---
