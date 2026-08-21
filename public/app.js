@@ -139,8 +139,51 @@
     return pickFile('image/jpeg,image/png,image/gif,image/webp')
   }
 
+  // Redueix la foto al navegador abans de pujar-la. El client puja fotos
+  // de camera enormes (4000px, 8+ MB): sense aixo li donarien error de
+  // mida o farien la web lentissima. Maxim 1600px pel costat gran,
+  // JPEG al 85%. Els GIF no es toquen (poden ser animats) i si per
+  // qualsevol motiu falla, es puja l'original tal qual.
+  var MAX_SIDE = 1600
+  var SMALL_ENOUGH = 700 * 1024 // ~500 KB reals en base64
+
+  function prepareImage(picked) {
+    return new Promise(function (resolve) {
+      if (!picked || picked.data.indexOf('data:image/gif') === 0) {
+        return resolve(picked)
+      }
+      var probe = new Image()
+      probe.onload = function () {
+        var w = probe.naturalWidth
+        var h = probe.naturalHeight
+        if ((w <= MAX_SIDE && h <= MAX_SIDE) && picked.data.length <= SMALL_ENOUGH) {
+          return resolve(picked)
+        }
+        try {
+          var scale = Math.min(1, MAX_SIDE / Math.max(w, h))
+          var canvas = document.createElement('canvas')
+          canvas.width = Math.round(w * scale)
+          canvas.height = Math.round(h * scale)
+          canvas.getContext('2d').drawImage(probe, 0, 0, canvas.width, canvas.height)
+          var out = canvas.toDataURL('image/jpeg', 0.85)
+          if (out.indexOf('data:image/jpeg') !== 0 || out.length >= picked.data.length) {
+            return resolve(picked)
+          }
+          resolve({
+            name: picked.name.replace(/\.[a-z0-9]+$/i, '') + '.jpg',
+            data: out,
+          })
+        } catch (e) {
+          resolve(picked)
+        }
+      }
+      probe.onerror = function () { resolve(picked) }
+      probe.src = picked.data
+    })
+  }
+
   function uploadImage() {
-    return pickImage().then(function (picked) {
+    return pickImage().then(prepareImage).then(function (picked) {
       if (!picked) return null
       toast('Subiendo la foto…')
       return api('POST', 'api/upload', picked).then(function (res) {
@@ -444,6 +487,9 @@
     }
 
     if (block.type === 'gallery') {
+      // Una galeria buida nomes te sentit en mode edicio (per poder-hi
+      // afegir fotos); al visitant no li mostrem res.
+      if (!(block.images || []).length && !state.editing) return null
       return el('section', { class: 'block' }, [renderGalleryBlock(block)])
     }
 
@@ -470,6 +516,7 @@
           el('li', { text: 'Haz clic sobre cualquier texto y escribe encima.' }),
           el('li', { text: 'Para las fotos, usa los botones «Cambiar foto» o «Poner foto».' }),
           el('li', { text: 'En cada foto puedes escribir el autor en la casilla «Autor de la foto».' }),
+          el('li', { text: 'Al final de cada página hay una galería: con «+ Añadir foto» puedes poner todas las fotos que quieras.' }),
           el('li', { text: 'Los documentos PDF (anexos, informes) se suben con «Añadir documento PDF».' }),
           el('li', { text: 'Cuando acabes, pulsa el botón verde «Guardar cambios» de arriba.' }),
         ]),
@@ -519,6 +566,11 @@
     renderNav()
     renderSiteFields()
     renderPage()
+    // Titol de la pestanya per pagina (util per a l'historial i marcadors)
+    var page = state.content.pages[state.slug]
+    if (page && page.title && state.slug !== 'inicio') {
+      document.title = page.title + ' · ' + (state.content.site.title || 'CC Mallorca')
+    }
   }
 
   // -------------------------------------------------- barra de format (text ric)

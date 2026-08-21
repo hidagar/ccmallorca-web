@@ -8,12 +8,30 @@
     "adreca": "Pollença, Mallorca"
   },
   "menu": [
-    { "slug": "inicio", "label": "Principal" },
-    { "slug": "articulos", "label": "Artículos" },
-    { "slug": "reportajes", "label": "Reportajes" },
-    { "slug": "informes", "label": "Informes" },
-    { "slug": "opinion", "label": "Opinión" },
-    { "slug": "mapa-del-web", "label": "Mapa del web" }
+    {
+      "slug": "inicio",
+      "label": "Principal"
+    },
+    {
+      "slug": "articulos",
+      "label": "Artículos"
+    },
+    {
+      "slug": "reportajes",
+      "label": "Reportajes"
+    },
+    {
+      "slug": "informes",
+      "label": "Informes"
+    },
+    {
+      "slug": "opinion",
+      "label": "Opinión"
+    },
+    {
+      "slug": "mapa-del-web",
+      "label": "Mapa del web"
+    }
   ],
   "pages": {
     "inicio": {
@@ -36,6 +54,11 @@
           "id": "inicio-nota",
           "type": "text",
           "html": "<p>Esta es la página principal del sitio. Todavía no se ha importado su contenido real de la web anterior — en cuanto se envíe el archivo <em>principal.htm</em> (o <em>index.htm</em>) se sustituirá este texto por el original.</p><p>Mientras tanto, puedes escribir aquí directamente usando el editor: pulsa \"Editar la web\" al pie de la página.</p>"
+        },
+        {
+          "id": "inicio-fotos-extra",
+          "type": "gallery",
+          "images": []
         }
       ]
     },
@@ -94,6 +117,11 @@
           "id": "articulos-biblio",
           "type": "text",
           "html": "<p style=\"font-size:.9em\">- H. L. R. Betoldi de Pomar (1970a): Fitolitos y zoolitos. Su significado geológico en sedimentos continentales. Asociación Geológica de Córdoba (Argentina), Boletín 1(1): 21-31.<br>- Ehrenberg, C. G. 1854. Mikrogeologie. 2 Vol. 374 pag. L. Voss. Leipzig.<br>- ENCINAS, J. A. i ALCOVER, J. A.,1997: El jaciment fossilifer de la Cova Estreta (Pollença, Mallorca). Endins, 21. Palma de Mallorca.<br>- ENCINAS, J. A. 2014: Corpus cavernario mayoricense (Pollença, Mallorca). Editorial El Gal, 1355 págs. y Anexo al CCM, wwwccmallorca.net /informes, año 2022, 272 págs. Pollença, Mallorca.<br>- Guérin C., 1965: Gallogoral (nov. Gen.) Milanese (Rütimeyer, 1878) un rupicapriné du Villafranchien de Europa occidental. Documents des Laboratoires de Géologie de la Faculte des Sciences de Lyon, 11, 353 pp.<br>- Qian M, Dou Z, Gu YX, Zhang Q, Lu RL, Zhu XL. Cloning and analysis of highly repetitive sequence fragments from takin (Budorcas taxicolor). Shi Yan Sheng Wu Xue Bao. 2002 Mar;35(1):36-41.<br>- Zhou M, Yu J, Li B, Ouyang B, Yang J., 2019 The complete mitochondrial genome of Budorcas taxicolor tibetana (Artiodactyla: Bovidae) and comparison with other Caprinae species. Int J. Biol Macromol; 121: 223-232.</p><p style=\"font-size:.9em\">Pollença (Mallorca), 30.03.2022</p>"
+        },
+        {
+          "id": "articulos-fotos-extra",
+          "type": "gallery",
+          "images": []
         }
       ]
     },
@@ -110,6 +138,11 @@
           "id": "reportajes-nota",
           "type": "text",
           "html": "<p>Esta sección del sitio original recoge reportajes de exploración, incluido uno sobre el <em>Avenc des Forasters</em> y evidencias de su exploración más antigua. Todavía no se ha importado su contenido real — en cuanto se envíe el archivo <em>reportajes.htm</em> se sustituirá este texto por el original.</p>"
+        },
+        {
+          "id": "reportajes-fotos-extra",
+          "type": "gallery",
+          "images": []
         }
       ]
     },
@@ -138,6 +171,11 @@
           "type": "document",
           "src": "",
           "label": "Actualizaciones CORPUS 2021"
+        },
+        {
+          "id": "informes-fotos-extra",
+          "type": "gallery",
+          "images": []
         }
       ]
     },
@@ -189,6 +227,11 @@
           "src": "",
           "alt": "Fotografía de espeleotemas (DaniDents.jpg)",
           "caption": ""
+        },
+        {
+          "id": "opinion-fotos-extra",
+          "type": "gallery",
+          "images": []
         }
       ]
     },
@@ -267,6 +310,11 @@
           "id": "mapa-nota",
           "type": "text",
           "html": "<p>Referencia bibliográfica: ENCINAS, J. A. 2014: <em>Corpus Cavernario Mayoricense</em> (Pollença, Mallorca). Editorial El Gal, 1355 págs.</p>"
+        },
+        {
+          "id": "mapa-del-web-fotos-extra",
+          "type": "gallery",
+          "images": []
         }
       ]
     }

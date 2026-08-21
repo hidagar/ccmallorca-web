@@ -20,7 +20,7 @@
 //   CCM_DATA_DIR  (/var/www/ccmallorca-data)
 
 const http = require('http')
-const { readFile, writeFile, mkdir, copyFile, readdir, unlink } = require('fs').promises
+const { readFile, writeFile, mkdir, copyFile, readdir, unlink, rename } = require('fs').promises
 const { existsSync, createReadStream, statSync } = require('fs')
 const path = require('path')
 const crypto = require('crypto')
@@ -201,6 +201,17 @@ async function isAuthed(req) {
   return verifyToken(readCookie(req, 'ccm_session'), cfg.secret)
 }
 
+// Darrere de cPanel/Passenger totes les connexions arriben com a
+// 127.0.0.1: si fessim servir remoteAddress, els intents fallits de
+// QUALSEVOL visitant comptarien contra el mateix comptador i 10 errors
+// de qui fos bloquejarien el login de tothom durant 15 minuts. Passenger
+// posa la IP real a X-Forwarded-For.
+function clientIp(req) {
+  const xff = req.headers['x-forwarded-for']
+  if (xff) return String(xff).split(',')[0].trim() || 'unknown'
+  return req.socket.remoteAddress || 'unknown'
+}
+
 // Limit d'intents de contrasenya per IP
 const attempts = new Map()
 function tooManyAttempts(ip) {
@@ -289,7 +300,90 @@ async function saveContentWithBackup(content) {
       await unlink(path.join(BACKUP_DIR, old)).catch(() => {})
     }
   } catch (e) {}
-  await writeFile(CONTENT_FILE, JSON.stringify(content, null, 2))
+  // Escriptura atomica: primer a un fitxer temporal i despres rename.
+  // Aixi, si el proces cau a mitja escriptura, el contingut del client
+  // no queda corromput a mitges.
+  const tmp = CONTENT_FILE + '.tmp'
+  await writeFile(tmp, JSON.stringify(content, null, 2))
+  await rename(tmp, CONTENT_FILE)
+}
+
+// ------------------------------------------- sincronitzacio de l'estructura
+// El contingut del client viu a CCM_DATA_DIR i sobreviu als desplegaments;
+// pero aixo vol dir que si afegim seccions o blocs nous a
+// content.default.json, les instal·lacions ja desplegades no els veurien
+// mai. En arrencar, fusionem al contingut existent tot allo del default
+// que li falti (pagines, blocs, entrades de menu), sense tocar mai res
+// del que el client ja ha escrit ni esborrar-li res.
+
+function syncStructure(current, defaults) {
+  let changed = false
+
+  // Entrades de menu que falten, inserides mantenint l'ordre del default
+  if (!Array.isArray(current.menu)) {
+    current.menu = []
+    changed = true
+  }
+  let menuInsertAt = 0
+  for (const item of defaults.menu || []) {
+    const idx = current.menu.findIndex((m) => m && m.slug === item.slug)
+    if (idx === -1) {
+      current.menu.splice(menuInsertAt, 0, JSON.parse(JSON.stringify(item)))
+      menuInsertAt++
+      changed = true
+    } else {
+      menuInsertAt = idx + 1
+    }
+  }
+
+  if (!current.pages || typeof current.pages !== 'object') {
+    current.pages = {}
+    changed = true
+  }
+
+  for (const slug of Object.keys(defaults.pages || {})) {
+    const defPage = defaults.pages[slug]
+    const curPage = current.pages[slug]
+
+    if (!curPage) {
+      current.pages[slug] = JSON.parse(JSON.stringify(defPage))
+      changed = true
+      continue
+    }
+
+    if (!Array.isArray(curPage.blocks)) {
+      curPage.blocks = []
+      changed = true
+    }
+
+    // Blocs que falten, inserits just despres de l'ultim bloc conegut
+    let insertAt = 0
+    for (const defBlock of defPage.blocks || []) {
+      const idx = curPage.blocks.findIndex((b) => b && b.id === defBlock.id)
+      if (idx === -1) {
+        curPage.blocks.splice(insertAt, 0, JSON.parse(JSON.stringify(defBlock)))
+        insertAt++
+        changed = true
+      } else {
+        insertAt = idx + 1
+      }
+    }
+  }
+
+  return changed
+}
+
+async function ensureStructureUpToDate() {
+  try {
+    const defaults = JSON.parse(await readFile(path.join(HERE, 'content.default.json'), 'utf8'))
+    const current = await loadContent()
+    if (syncStructure(current, defaults)) {
+      await saveContentWithBackup(current)
+      console.log('Estructura actualitzada amb els blocs nous del default.')
+    }
+  } catch (e) {
+    console.error('No s\'ha pogut sincronitzar l\'estructura:', e.message)
+  }
 }
 
 // ------------------------------------------------------------------- pujades
@@ -436,7 +530,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (pathname === '/api/login' && req.method === 'POST') {
-      const ip = req.socket.remoteAddress || 'unknown'
+      const ip = clientIp(req)
       if (tooManyAttempts(ip)) {
         return sendJson(res, 429, { error: 'Demasiados intentos. Espera unos minutos.' })
       }
@@ -517,6 +611,7 @@ const HOST = process.env.CCM_HOST || '127.0.0.1'
 
 async function start() {
   await ensureData()
+  await ensureStructureUpToDate()
   server.listen(PORT, HOST, () => {
     console.log(`CC Mallorca escoltant a http://${HOST}:${PORT} (dades: ${DATA_DIR})`)
   })
