@@ -50,7 +50,10 @@ Passenger se reinicie solo en cada despliegue).
   - `CCM_DATA_DIR` = una ruta **fuera** de `repositories/`, por ejemplo
     `/home/TU_USUARIO/ccmallorca-data` (así el contenido y las fotos que
     suba el cliente nunca se pierden al actualizar el código)
-  - `CCM_PASSWORD` = la contraseña de edición inicial
+  - `CCM_PASSWORD` = la contraseña del **cliente** (solo cambia textos y fotos)
+  - `CCM_ADMIN_PASSWORD` = **tu** contraseña de administrador (cambia la
+    estructura: crear/borrar páginas, añadir cajones, cabeceras…). Si no la
+    pones, se genera una al azar y aparece en el log de arranque de la app.
 
 Guarda, pulsa **"Run NPM Install"** (no hay dependencias, pero cPanel lo
 pide para reconocer la app) y luego **"Start App"**.
@@ -127,6 +130,34 @@ También puede **«Descartar»** para volver a la última versión guardada, o
 **«Salir»** para dejar el modo edición. Si intenta cerrar la pestaña con
 cambios sin guardar, el navegador le avisa.
 
+---
+
+## Modo administrador (para ti, el desarrollador)
+
+Entrando con la **contraseña de administrador** (`CCM_ADMIN_PASSWORD`), en
+lugar de la del cliente, la barra superior se vuelve **azul** y aparecen los
+controles de estructura. Es la misma web, encima de la propia página (WYSIWYG):
+
+- **Administrar páginas** (panel azul arriba de cada página):
+  - Cambiar el nombre que sale en el menú
+  - Mover la página a izquierda/derecha en el menú
+  - **Crear página nueva** / **Borrar esta página**
+- **Cajones** (cada bloque tiene una barra encima):
+  - **↑ Subir** / **↓ Bajar** para reordenar
+  - **🗑 Borrar** el cajón
+- **Añadir un cajón nuevo** al final de la página: Título, Texto, Foto,
+  Galería de fotos, o Documento PDF
+- **Imagen de cabecera**: banner opcional arriba de cada página
+
+Cuando guardas como admin, se guarda la **estructura entera** (endpoint
+`/api/structure`). Lo que hagas aquí define qué puede editar luego el cliente:
+él solo cambia los valores (textos y fotos) de los cajones que tú has puesto,
+nunca su disposición. Así se lo dejas montado como te pida y él solo rellena.
+
+> El servidor **no confía** en lo que llega del admin: reconstruye el
+> contenido validando cada tipo de cajón, generando ids únicos y limpiando
+> todo el HTML. Ni el cliente ni el admin pueden inyectar scripts.
+
 ### Cambiar la contraseña
 
 En cPanel, desde el **Terminal** si está disponible, o si no, cambiando
@@ -136,7 +167,10 @@ Node.js App** y reiniciando — pero eso solo aplica en la primera instalación
 Para cambiarla en caliente hace falta ejecutar:
 
 ```bash
+# contraseña del cliente
 CCM_DATA_DIR=/ruta/a/ccmallorca-data node server.js --set-password NUEVA
+# tu contraseña de administrador
+CCM_DATA_DIR=/ruta/a/ccmallorca-data node server.js --set-admin-password NUEVA
 ```
 
 y reiniciar la app (botón "Restart" en Setup Node.js App, o

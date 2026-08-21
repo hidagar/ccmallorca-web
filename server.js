@@ -141,14 +141,35 @@ async function ensureData() {
   if (!existsSync(CONFIG_FILE)) {
     const password = process.env.CCM_PASSWORD || 'mallorca'
     const salt = crypto.randomBytes(16).toString('hex')
+    // Contrasenya d'administrador (la del desenvolupador): pot canviar
+    // l'estructura. Si no se'n dona cap, se'n genera una a l'atzar i
+    // s'imprimeix, per no deixar mai un admin amb contrasenya coneguda.
+    const adminPassword = process.env.CCM_ADMIN_PASSWORD || crypto.randomBytes(9).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
+    const adminSalt = crypto.randomBytes(16).toString('hex')
     const config = {
       secret: crypto.randomBytes(32).toString('hex'),
       salt,
       passwordHash: hashPassword(password, salt),
+      adminSalt,
+      adminPasswordHash: hashPassword(adminPassword, adminSalt),
     }
     await writeFile(CONFIG_FILE, JSON.stringify(config, null, 2))
-    console.log(`Configuracio creada. Contrasenya d'edicio: "${password}"`)
-    console.log('Canvia-la amb: node server.js --set-password NOVA')
+    console.log(`Configuracio creada.`)
+    console.log(`  Contrasenya d'edicio (client): "${password}"`)
+    console.log(`  Contrasenya d'administrador:   "${adminPassword}"`)
+    console.log('Canvia-les amb: node server.js --set-password NOVA  /  --set-admin-password NOVA')
+  } else {
+    // Migracio: instal·lacions creades abans del rol d'administrador no
+    // tenen adminPasswordHash. L'afegim (a partir de CCM_ADMIN_PASSWORD o
+    // una a l'atzar) perque l'admin pugui entrar.
+    const cfg = JSON.parse(await readFile(CONFIG_FILE, 'utf8'))
+    if (!cfg.adminPasswordHash) {
+      const adminPassword = process.env.CCM_ADMIN_PASSWORD || crypto.randomBytes(9).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
+      cfg.adminSalt = crypto.randomBytes(16).toString('hex')
+      cfg.adminPasswordHash = hashPassword(adminPassword, cfg.adminSalt)
+      await writeFile(CONFIG_FILE, JSON.stringify(cfg, null, 2))
+      console.log(`Afegida contrasenya d'administrador: "${adminPassword}"`)
+    }
   }
 }
 
@@ -168,21 +189,27 @@ function sign(value, secret) {
   return toBase64Url(crypto.createHmac('sha256', secret).update(value).digest())
 }
 
-function makeToken(secret) {
-  const payload = toBase64Url(Buffer.from(JSON.stringify({ exp: Date.now() + 12 * 3600 * 1000 })))
+function makeToken(secret, role) {
+  const payload = toBase64Url(Buffer.from(JSON.stringify({
+    exp: Date.now() + 12 * 3600 * 1000,
+    role: role || 'editor',
+  })))
   return `${payload}.${sign(payload, secret)}`
 }
 
-function verifyToken(token, secret) {
-  if (typeof token !== 'string' || !token.includes('.')) return false
+// Retorna el rol ('admin' | 'editor') si el token es valid, o null.
+function tokenRole(token, secret) {
+  if (typeof token !== 'string' || !token.includes('.')) return null
   const [payload, sig] = token.split('.')
   const expected = sign(payload, secret)
-  if (sig.length !== expected.length) return false
-  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return false
+  if (sig.length !== expected.length) return null
+  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null
   try {
-    return JSON.parse(fromBase64Url(payload).toString()).exp > Date.now()
+    const data = JSON.parse(fromBase64Url(payload).toString())
+    if (data.exp <= Date.now()) return null
+    return data.role === 'admin' ? 'admin' : 'editor'
   } catch (e) {
-    return false
+    return null
   }
 }
 
@@ -196,9 +223,9 @@ function readCookie(req, name) {
   return null
 }
 
-async function isAuthed(req) {
+async function roleOf(req) {
   const cfg = await loadConfig()
-  return verifyToken(readCookie(req, 'ccm_session'), cfg.secret)
+  return tokenRole(readCookie(req, 'ccm_session'), cfg.secret)
 }
 
 // Darrere de cPanel/Passenger totes les connexions arriben com a
@@ -253,6 +280,13 @@ function mergeContent(current, incoming) {
     if (typeof page.title === 'string') target.title = stripTags(page.title).slice(0, 200)
     if (typeof page.intro === 'string') target.intro = sanitizeHtml(page.intro)
 
+    // El client pot canviar la FOTO de capçalera (es una foto), pero
+    // nomes si l'admin ja ha creat aquest bloc de capçalera a la pagina.
+    if (target.header && page.header) {
+      if (isSafeSrc(page.header.src)) target.header.src = page.header.src
+      if (typeof page.header.alt === 'string') target.header.alt = stripTags(page.header.alt).slice(0, 300)
+    }
+
     for (const block of Array.isArray(page.blocks) ? page.blocks : []) {
       const dest = target.blocks.find((b) => b.id === (block && block.id))
       if (!dest) continue
@@ -286,6 +320,148 @@ function mergeContent(current, incoming) {
       }
     }
   }
+
+  return out
+}
+
+// --------------------------------------------- estructura (nomes admin)
+// L'administrador SI pot canviar l'estructura: crear/esborrar pagines,
+// afegir/treure/reordenar blocs, editar el menu, etc. Aixo no vol dir
+// confiar en el que arriba: reconstruim el contingut des de zero amb
+// nomes els camps permesos per tipus, i sanejem tots els valors.
+
+const BLOCK_TYPES = ['heading', 'text', 'image', 'gallery', 'document']
+const MAX_PAGES = 40
+const MAX_BLOCKS = 120
+const MAX_MENU = 40
+
+function slugify(s) {
+  return String(s || '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48)
+}
+
+function makeId(prefix, used) {
+  let base = slugify(stripTags(prefix)).slice(0, 32) || 'bloc'
+  let id = base
+  let n = 2
+  while (used[id]) { id = base + '-' + n; n++ }
+  used[id] = true
+  return id
+}
+
+function sanitizeBlock(raw, usedIds) {
+  if (!raw || BLOCK_TYPES.indexOf(raw.type) === -1) return null
+  const id = raw.id && /^[\w-]{1,80}$/.test(raw.id) && !usedIds[raw.id]
+    ? (usedIds[raw.id] = true, raw.id)
+    : makeId(raw.type + '-' + (raw.text || raw.label || ''), usedIds)
+
+  if (raw.type === 'heading') {
+    return { id, type: 'heading', text: stripTags(raw.text || '').slice(0, 200) }
+  }
+  if (raw.type === 'text') {
+    return { id, type: 'text', html: sanitizeHtml(raw.html || '') }
+  }
+  if (raw.type === 'image') {
+    return {
+      id, type: 'image',
+      src: isSafeSrc(raw.src) ? raw.src : '',
+      alt: stripTags(raw.alt || '').slice(0, 300),
+      caption: stripTags(raw.caption || '').slice(0, 300),
+      credit: stripTags(raw.credit || '').slice(0, 120),
+    }
+  }
+  if (raw.type === 'document') {
+    return {
+      id, type: 'document',
+      src: isSafeSrc(raw.src) ? raw.src : '',
+      label: stripTags(raw.label || '').slice(0, 200),
+    }
+  }
+  if (raw.type === 'gallery') {
+    const images = (Array.isArray(raw.images) ? raw.images : [])
+      .filter((im) => im && isSafeSrc(im.src))
+      .slice(0, 80)
+      .map((im) => ({
+        src: im.src,
+        alt: stripTags(im.alt || '').slice(0, 300),
+        caption: stripTags(im.caption || '').slice(0, 300),
+        credit: stripTags(im.credit || '').slice(0, 120),
+      }))
+    return { id, type: 'gallery', images }
+  }
+  return null
+}
+
+function sanitizeStructure(incoming) {
+  const out = { site: {}, menu: [], pages: {} }
+
+  const site = (incoming && incoming.site) || {}
+  for (const key of ['title', 'subtitle', 'footer', 'email', 'telefon', 'adreca']) {
+    out.site[key] = stripTags(site[key] || '').slice(0, 300)
+  }
+
+  // Pagines
+  const pagesIn = (incoming && typeof incoming.pages === 'object' && incoming.pages) || {}
+  const usedSlugs = {}
+  const slugCount = Object.keys(pagesIn).length
+  if (slugCount > MAX_PAGES) throw new Error('Demasiadas páginas')
+
+  for (const rawSlug of Object.keys(pagesIn)) {
+    const page = pagesIn[rawSlug] || {}
+    let slug = /^[a-z0-9-]{1,48}$/.test(rawSlug) ? rawSlug : slugify(rawSlug)
+    if (!slug) continue
+    if (usedSlugs[slug]) {
+      let n = 2
+      while (usedSlugs[slug + '-' + n]) n++
+      slug = slug + '-' + n
+    }
+    usedSlugs[slug] = true
+
+    const usedIds = {}
+    const blocksIn = Array.isArray(page.blocks) ? page.blocks.slice(0, MAX_BLOCKS) : []
+    const blocks = []
+    for (const b of blocksIn) {
+      const sb = sanitizeBlock(b, usedIds)
+      if (sb) blocks.push(sb)
+    }
+
+    const outPage = {
+      title: stripTags(page.title || '').slice(0, 200),
+      intro: sanitizeHtml(page.intro || ''),
+      blocks,
+    }
+    // Imatge de capçalera opcional (bàner al capdamunt de la pàgina)
+    if (page.header && isSafeSrc(page.header.src)) {
+      outPage.header = {
+        src: page.header.src,
+        alt: stripTags(page.header.alt || '').slice(0, 300),
+      }
+    }
+    out.pages[slug] = outPage
+  }
+
+  // Menu: nomes entrades que apunten a pagines existents; si no ve menu,
+  // el generem a partir de les pagines en el seu ordre.
+  const menuIn = Array.isArray(incoming && incoming.menu) ? incoming.menu : []
+  const seen = {}
+  for (const m of menuIn.slice(0, MAX_MENU)) {
+    if (!m || !out.pages[m.slug] || seen[m.slug]) continue
+    seen[m.slug] = true
+    out.menu.push({ slug: m.slug, label: stripTags(m.label || out.pages[m.slug].title || m.slug).slice(0, 60) })
+  }
+  // Qualsevol pagina sense entrada de menu s'afegeix al final (mai queden
+  // pagines "orfes" inaccessibles).
+  for (const slug of Object.keys(out.pages)) {
+    if (!seen[slug]) {
+      out.menu.push({ slug, label: (out.pages[slug].title || slug).slice(0, 60) })
+    }
+  }
+
+  if (!Object.keys(out.pages).length) throw new Error('La web necesita al menos una página')
 
   return out
 }
@@ -526,7 +702,8 @@ const server = http.createServer(async (req, res) => {
   try {
     // --- API ---
     if (pathname === '/api/session') {
-      return sendJson(res, 200, { authenticated: await isAuthed(req) })
+      const role = await roleOf(req)
+      return sendJson(res, 200, { authenticated: !!role, role: role })
     }
 
     if (pathname === '/api/login' && req.method === 'POST') {
@@ -536,14 +713,20 @@ const server = http.createServer(async (req, res) => {
       }
       const body = await readBody(req)
       const cfg = await loadConfig()
-      const ok = hashPassword(body.password || '', cfg.salt) === cfg.passwordHash
-      if (!ok) {
+      const given = body.password || ''
+      let role = null
+      if (cfg.adminPasswordHash && hashPassword(given, cfg.adminSalt) === cfg.adminPasswordHash) {
+        role = 'admin'
+      } else if (hashPassword(given, cfg.salt) === cfg.passwordHash) {
+        role = 'editor'
+      }
+      if (!role) {
         noteAttempt(ip)
         return sendJson(res, 401, { error: 'La contraseña no es correcta' })
       }
       attempts.delete(ip)
-      return sendJson(res, 200, { ok: true }, {
-        'Set-Cookie': `ccm_session=${makeToken(cfg.secret)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=43200`,
+      return sendJson(res, 200, { ok: true, role: role }, {
+        'Set-Cookie': `ccm_session=${makeToken(cfg.secret, role)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=43200`,
       })
     }
 
@@ -553,16 +736,30 @@ const server = http.createServer(async (req, res) => {
       })
     }
 
+    // El client (editor) nomes canvia valors
     if (pathname === '/api/content' && req.method === 'PUT') {
-      if (!(await isAuthed(req))) return sendJson(res, 401, { error: 'Tienes que iniciar sesión otra vez' })
+      if (!(await roleOf(req))) return sendJson(res, 401, { error: 'Tienes que iniciar sesión otra vez' })
       const incoming = await readBody(req)
       const merged = mergeContent(await loadContent(), incoming)
       await saveContentWithBackup(merged)
       return sendJson(res, 200, { ok: true, content: merged })
     }
 
+    // L'administrador pot canviar l'estructura sencera
+    if (pathname === '/api/structure' && req.method === 'PUT') {
+      if ((await roleOf(req)) !== 'admin') return sendJson(res, 403, { error: 'Solo el administrador puede cambiar la estructura' })
+      let saved
+      try {
+        saved = sanitizeStructure(await readBody(req))
+      } catch (e) {
+        return sendJson(res, 400, { error: e.message || 'Estructura no válida' })
+      }
+      await saveContentWithBackup(saved)
+      return sendJson(res, 200, { ok: true, content: saved })
+    }
+
     if (pathname === '/api/upload' && req.method === 'POST') {
-      if (!(await isAuthed(req))) return sendJson(res, 401, { error: 'Tienes que iniciar sesión otra vez' })
+      if (!(await roleOf(req))) return sendJson(res, 401, { error: 'Tienes que iniciar sesión otra vez' })
       const result = await handleUpload(await readBody(req))
       return sendJson(res, result.error ? 400 : 200, result)
     }
@@ -593,14 +790,19 @@ const server = http.createServer(async (req, res) => {
 
 // ------------------------------------------------------------------- arrencada
 
-async function setPasswordAndExit(nueva) {
+async function setPasswordAndExit(nueva, admin) {
   await ensureData()
   const cfg = await loadConfig()
-  cfg.salt = crypto.randomBytes(16).toString('hex')
-  cfg.passwordHash = hashPassword(nueva, cfg.salt)
+  if (admin) {
+    cfg.adminSalt = crypto.randomBytes(16).toString('hex')
+    cfg.adminPasswordHash = hashPassword(nueva, cfg.adminSalt)
+  } else {
+    cfg.salt = crypto.randomBytes(16).toString('hex')
+    cfg.passwordHash = hashPassword(nueva, cfg.salt)
+  }
   cfg.secret = crypto.randomBytes(32).toString('hex') // tanca sessions obertes
   await writeFile(CONFIG_FILE, JSON.stringify(cfg, null, 2))
-  console.log('Contrasenya actualitzada.')
+  console.log(admin ? 'Contrasenya d\'administrador actualitzada.' : 'Contrasenya d\'edicio actualitzada.')
   process.exit(0)
 }
 
@@ -618,13 +820,16 @@ async function start() {
 }
 
 const setPwdIdx = process.argv.indexOf('--set-password')
-if (setPwdIdx !== -1) {
-  const nueva = process.argv[setPwdIdx + 1]
+const setAdminIdx = process.argv.indexOf('--set-admin-password')
+if (setPwdIdx !== -1 || setAdminIdx !== -1) {
+  const admin = setAdminIdx !== -1
+  const idx = admin ? setAdminIdx : setPwdIdx
+  const nueva = process.argv[idx + 1]
   if (!nueva) {
-    console.error('Us: node server.js --set-password NOVA_CONTRASENYA')
+    console.error('Us: node server.js --set-password NOVA  |  --set-admin-password NOVA')
     process.exit(1)
   }
-  setPasswordAndExit(nueva).catch((err) => {
+  setPasswordAndExit(nueva, admin).catch((err) => {
     console.error(err)
     process.exit(1)
   })

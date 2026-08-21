@@ -353,6 +353,67 @@ body.editing .footer-text:hover { background: rgba(255,255,255,.12); }
 .help-note ul { margin: 0; padding-left: 22px; }
 .help-note li { margin-bottom: 5px; }
 
+/* ------------------------------------------------------ mode administrador */
+
+.editbar.is-admin { background: #e7f0fb; border-bottom-color: #2f6fb0; }
+.editbar.is-admin .editbar-status .dot { background: #2f6fb0; }
+.editbar.is-admin .editbar-status.dirty .dot { background: var(--edit); }
+
+.admin-badge {
+  display: inline-block; background: #2f6fb0; color: #fff;
+  font-size: .8rem; font-weight: 700; padding: 3px 10px;
+  border-radius: 999px; margin-left: 8px;
+}
+
+.admin-pagebar {
+  background: #eef4fb; border: 1px solid #cbdcef;
+  border-radius: 12px; padding: 16px 18px; margin: 0 0 24px;
+}
+.admin-pagebar h2 { margin: 0 0 10px; font-size: 1.05rem; color: #234b70; }
+.admin-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.admin-row + .admin-row { margin-top: 10px; }
+.admin-input {
+  font: inherit; padding: 9px 12px; border: 2px solid #cbdcef;
+  border-radius: 8px; min-width: 180px; color: var(--ink);
+}
+.admin-input:focus { border-color: #2f6fb0; outline: none; }
+
+.btn-admin { background: #2f6fb0; border-color: #2f6fb0; color: #fff; }
+.btn-admin:hover { filter: brightness(1.05); }
+.btn-sm { padding: 8px 14px; font-size: .95rem; }
+
+.block-controls {
+  display: flex; gap: 6px; margin: 0 0 8px; flex-wrap: wrap;
+  padding: 6px 8px; background: #eef4fb; border: 1px dashed #cbdcef;
+  border-radius: 8px; align-items: center;
+}
+.block-controls .block-kind {
+  font-size: .78rem; font-weight: 700; color: #234b70;
+  text-transform: uppercase; letter-spacing: .03em; margin-right: auto;
+}
+.block-ctrl {
+  font: inherit; font-size: .95rem; cursor: pointer;
+  background: #fff; border: 1px solid #cbdcef; border-radius: 6px;
+  padding: 5px 11px; color: #234b70; font-weight: 600;
+}
+.block-ctrl:hover { background: #dbe8f6; }
+.block-ctrl.danger { color: var(--err); border-color: #e6b3ad; }
+.block-ctrl:disabled { opacity: .4; cursor: default; }
+
+.add-block {
+  margin: 10px 0 0; padding: 16px; text-align: center;
+  border: 2px dashed #2f6fb0; border-radius: 12px; background: #eef4fb;
+}
+.add-block p { margin: 0 0 10px; font-weight: 700; color: #234b70; }
+.add-block-btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+.page-header-img { margin: 0; position: relative; }
+.page-header-img img {
+  width: 100%; max-height: 240px; object-fit: cover;
+  border-radius: 12px 12px 0 0; display: block; border: 1px solid var(--paper-line);
+}
+.page-inner.has-header { border-top-left-radius: 0; border-top-right-radius: 0; }
+
 /* --------------------------------------------------- ampliar fotos (lightbox) */
 
 .lightbox {

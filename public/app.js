@@ -8,8 +8,34 @@
     content: null,
     slug: 'inicio',
     editing: false,
+    admin: false,
     dirty: false,
     saving: false,
+  }
+
+  function uid(prefix) {
+    return (prefix || 'bloc') + '-' + Math.random().toString(36).slice(2, 8)
+  }
+
+  function slugifyClient(s) {
+    return String(s || '')
+      .toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48)
+  }
+
+  function newBlock(type) {
+    var id = uid(type)
+    if (type === 'heading') return { id: id, type: 'heading', text: 'Nuevo título' }
+    if (type === 'text') return { id: id, type: 'text', html: '<p>Escribe aquí el texto…</p>' }
+    if (type === 'image') return { id: id, type: 'image', src: '', alt: '', caption: '', credit: '' }
+    if (type === 'gallery') return { id: id, type: 'gallery', images: [] }
+    if (type === 'document') return { id: id, type: 'document', src: '', label: '' }
+    return null
+  }
+
+  var BLOCK_KIND = {
+    heading: 'Título', text: 'Texto', image: 'Foto',
+    gallery: 'Galería de fotos', document: 'Documento PDF',
   }
 
   var main = document.getElementById('contenido')
@@ -501,6 +527,172 @@
     return null
   }
 
+  function renderHeader(page) {
+    if (!page.header || !page.header.src) {
+      // Sense capçalera: nomes l'admin veu el boto per posar-ne una.
+      if (!state.admin) return null
+      return el('div', { class: 'page-header-img' }, [
+        el('div', { class: 'photo-empty', text: 'Sin imagen de cabecera.' }),
+        photoActions([{
+          label: 'Poner imagen de cabecera',
+          onClick: function () {
+            uploadImage().then(function (src) {
+              if (!src) return
+              page.header = { src: src, alt: '' }
+              markDirty(); renderPage()
+            })
+          },
+        }]),
+      ])
+    }
+    var wrap = el('div', { class: 'page-header-img photo-wrap' }, [
+      el('img', { src: page.header.src, alt: page.header.alt || '' }),
+    ])
+    if (state.editing) {
+      var buttons = [{
+        label: 'Cambiar imagen de cabecera',
+        onClick: function () {
+          uploadImage().then(function (src) {
+            if (!src) return
+            page.header.src = src
+            markDirty(); renderPage()
+          })
+        },
+      }]
+      if (state.admin) {
+        buttons.push({
+          label: 'Quitar cabecera', danger: true,
+          onClick: function () {
+            delete page.header
+            markDirty(); renderPage()
+          },
+        })
+      }
+      wrap.appendChild(photoActions(buttons))
+    }
+    return wrap
+  }
+
+  function adminBlockControls(page, index) {
+    var block = page.blocks[index]
+    function move(delta) {
+      var j = index + delta
+      if (j < 0 || j >= page.blocks.length) return
+      var tmp = page.blocks[index]
+      page.blocks[index] = page.blocks[j]
+      page.blocks[j] = tmp
+      markDirty(); renderPage()
+    }
+    return el('div', { class: 'block-controls' }, [
+      el('span', { class: 'block-kind', text: BLOCK_KIND[block.type] || block.type }),
+      el('button', {
+        type: 'button', class: 'block-ctrl', text: '↑ Subir',
+        disabled: index === 0, onclick: function () { move(-1) },
+      }),
+      el('button', {
+        type: 'button', class: 'block-ctrl', text: '↓ Bajar',
+        disabled: index === page.blocks.length - 1, onclick: function () { move(1) },
+      }),
+      el('button', {
+        type: 'button', class: 'block-ctrl danger', text: '🗑 Borrar',
+        onclick: function () {
+          if (!confirm('¿Borrar este cajón de «' + (BLOCK_KIND[block.type] || block.type) + '»?')) return
+          page.blocks.splice(index, 1)
+          markDirty(); renderPage()
+        },
+      }),
+    ])
+  }
+
+  function addBlockRow(page) {
+    function add(type) {
+      page.blocks.push(newBlock(type))
+      markDirty(); renderPage()
+      // Deixa la pagina a baix de tot, on s'acaba d'afegir el bloc
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    }
+    var btn = function (type, label) {
+      return el('button', {
+        type: 'button', class: 'btn btn-admin btn-sm',
+        text: label, onclick: function () { add(type) },
+      })
+    }
+    return el('div', { class: 'add-block' }, [
+      el('p', { text: 'Añadir un cajón nuevo a esta página:' }),
+      el('div', { class: 'add-block-btns' }, [
+        btn('heading', '+ Título'),
+        btn('text', '+ Texto'),
+        btn('image', '+ Foto'),
+        btn('gallery', '+ Galería de fotos'),
+        btn('document', '+ Documento PDF'),
+      ]),
+    ])
+  }
+
+  function renderAdminPageBar(slug) {
+    var menu = state.content.menu
+    var mi = menu.findIndex(function (m) { return m.slug === slug })
+
+    var labelInput = el('input', {
+      class: 'admin-input', type: 'text',
+      value: (menu[mi] && menu[mi].label) || '',
+      placeholder: 'Nombre en el menú',
+    })
+    labelInput.addEventListener('input', function () {
+      if (menu[mi]) { menu[mi].label = labelInput.value; markDirty(); renderNav() }
+    })
+
+    function movePage(delta) {
+      var j = mi + delta
+      if (j < 0 || j >= menu.length) return
+      var tmp = menu[mi]; menu[mi] = menu[j]; menu[j] = tmp
+      markDirty(); renderNav(); renderPage()
+    }
+
+    return el('div', { class: 'admin-pagebar' }, [
+      el('h2', { text: 'Administrar páginas' }),
+      el('div', { class: 'admin-row' }, [
+        el('span', { text: 'Nombre en el menú:' }),
+        labelInput,
+        el('button', { type: 'button', class: 'btn btn-ghost btn-sm', text: '← Mover', disabled: mi <= 0, onclick: function () { movePage(-1) } }),
+        el('button', { type: 'button', class: 'btn btn-ghost btn-sm', text: 'Mover →', disabled: mi >= menu.length - 1, onclick: function () { movePage(1) } }),
+      ]),
+      el('div', { class: 'admin-row' }, [
+        el('button', { type: 'button', class: 'btn btn-admin btn-sm', text: '+ Crear página nueva', onclick: createPage }),
+        el('button', {
+          type: 'button', class: 'btn btn-danger btn-sm', text: '🗑 Borrar esta página',
+          disabled: menu.length <= 1,
+          onclick: function () { deletePage(slug) },
+        }),
+      ]),
+    ])
+  }
+
+  function createPage() {
+    var name = prompt('Nombre de la página nueva (por ejemplo: Novedades):', '')
+    if (!name) return
+    name = name.trim()
+    if (!name) return
+    var base = slugifyClient(name) || 'pagina'
+    var slug = base, n = 2
+    while (state.content.pages[slug]) { slug = base + '-' + n; n++ }
+    state.content.pages[slug] = {
+      title: name, intro: '', blocks: [newBlock('text')],
+    }
+    state.content.menu.push({ slug: slug, label: name })
+    markDirty()
+    go(slug) // navega i re-renderitza
+  }
+
+  function deletePage(slug) {
+    if (state.content.menu.length <= 1) return
+    if (!confirm('¿Borrar la página entera y todo su contenido? Esto no se puede deshacer (salvo con las copias de seguridad).')) return
+    delete state.content.pages[slug]
+    state.content.menu = state.content.menu.filter(function (m) { return m.slug !== slug })
+    markDirty()
+    go(state.content.menu[0].slug)
+  }
+
   function renderPage() {
     var page = state.content.pages[state.slug]
     main.innerHTML = ''
@@ -509,7 +701,9 @@
       return
     }
 
-    if (state.editing) {
+    if (state.admin) {
+      main.appendChild(renderAdminPageBar(state.slug))
+    } else if (state.editing) {
       main.appendChild(el('div', { class: 'help-note' }, [
         el('h2', { text: 'Estás editando esta página' }),
         el('ul', null, [
@@ -523,7 +717,10 @@
       ]))
     }
 
-    var inner = el('div', { class: 'page-inner' })
+    var header = renderHeader(page)
+    if (header) main.appendChild(header)
+
+    var inner = el('div', { class: 'page-inner' + (page.header && page.header.src ? ' has-header' : '') })
     main.appendChild(inner)
 
     var title = el('h1', { class: 'page-title', text: page.title || '' })
@@ -534,10 +731,14 @@
     if (state.editing || page.intro) inner.appendChild(intro)
     if (state.editing) bindEditableText(intro, function (v) { page.intro = v }, false)
 
-    ;(page.blocks || []).forEach(function (block) {
+    ;(page.blocks || []).forEach(function (block, index) {
       var node = renderBlock(block)
-      if (node) inner.appendChild(node)
+      if (!node) return
+      if (state.admin) node.insertBefore(adminBlockControls(page, index), node.firstChild)
+      inner.appendChild(node)
     })
+
+    if (state.admin) inner.appendChild(addBlockRow(page))
   }
 
   function renderSiteFields() {
@@ -659,6 +860,7 @@
         el('div', { class: 'editbar-status' }, [
           el('span', { class: 'dot', 'aria-hidden': 'true' }),
           el('span', { class: 'editbar-label', text: 'Todo guardado' }),
+          state.admin ? el('span', { class: 'admin-badge', text: 'ADMINISTRADOR' }) : null,
         ]),
         el('div', { class: 'editbar-actions' }, [
           el('button', {
@@ -683,8 +885,15 @@
     if (state.saving || !state.dirty) return
     state.saving = true
     updateEditbar()
-    api('PUT', 'api/content', state.content).then(function (res) {
+    // L'admin guarda l'estructura sencera; el client nomes els valors.
+    var endpoint = state.admin ? 'api/structure' : 'api/content'
+    api('PUT', endpoint, state.content).then(function (res) {
       state.content = res.content
+      // La pagina actual pot haver canviat d'slug (l'admin pot haver-la
+      // reanomenat); si ja no existeix, anem a la primera del menu.
+      if (!state.content.pages[state.slug]) {
+        state.slug = (state.content.menu[0] && state.content.menu[0].slug) || 'inicio'
+      }
       state.dirty = false
       state.saving = false
       updateEditbar()
@@ -708,10 +917,12 @@
     })
   }
 
-  function enterEditing() {
+  function enterEditing(role) {
     state.editing = true
+    state.admin = role === 'admin'
     document.body.classList.add('editing')
     if (!editbar) buildEditbar()
+    editbar.classList.toggle('is-admin', state.admin)
     if (!formatBar) buildFormatBar()
     editbar.style.display = ''
     updateEditbar()
@@ -722,9 +933,12 @@
     if (state.dirty && !confirm('Tienes cambios sin guardar. ¿Salir y perderlos?')) return
     api('POST', 'api/logout').catch(function () {})
     state.editing = false
+    state.admin = false
     state.dirty = false
     document.body.classList.remove('editing')
-    if (editbar) editbar.style.display = 'none'
+    // Destruim la barra perque la propera entrada la reconstrueixi amb
+    // el rol correcte (i sense la insignia d'admin si toca).
+    if (editbar) { editbar.remove(); editbar = null }
     if (formatBar) formatBar.classList.remove('visible')
     loadContent().then(render)
     toast('Has salido del modo edición')
@@ -748,10 +962,10 @@
 
     function submit() {
       error.textContent = ''
-      api('POST', 'api/login', { password: input.value }).then(function () {
+      api('POST', 'api/login', { password: input.value }).then(function (res) {
         close()
-        enterEditing()
-        toast('Ya puedes editar la web', 'ok')
+        enterEditing(res.role)
+        toast(res.role === 'admin' ? 'Modo administrador' : 'Ya puedes editar la web', 'ok')
       }).catch(function (err) {
         error.textContent = err.message
         input.select()
@@ -820,7 +1034,7 @@
     // Si ja hi ha sessio oberta (o s'ha entrat amb ?edit=1) passem a mode edicio
     var wants = location.search.indexOf('edit=1') !== -1 || location.hash === '#edit'
     return api('GET', 'api/session').then(function (s) {
-      if (s.authenticated) enterEditing()
+      if (s.authenticated) enterEditing(s.role)
       else if (wants) askPassword()
     }).catch(function () {})
   }).catch(function () {
