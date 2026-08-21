@@ -182,13 +182,72 @@
     }))
   }
 
+  // ----------------------------------------------------- ampliar fotos (lightbox)
+
+  function openLightbox(src, caption) {
+    var overlay = el('div', { class: 'lightbox', role: 'dialog', 'aria-label': 'Foto ampliada' })
+    var closeBtn = el('button', {
+      type: 'button', class: 'lightbox-close', 'aria-label': 'Cerrar', text: '✕',
+    })
+    var img = el('img', { src: src, alt: caption || '' })
+    var content = el('div', { class: 'lightbox-content' }, [img])
+    if (caption) content.appendChild(el('p', { class: 'lightbox-caption', text: caption }))
+
+    function close() {
+      overlay.remove()
+      document.removeEventListener('keydown', onKey)
+    }
+    function onKey(e) { if (e.key === 'Escape') close() }
+
+    closeBtn.addEventListener('click', close)
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) close() })
+    document.addEventListener('keydown', onKey)
+
+    overlay.appendChild(closeBtn)
+    overlay.appendChild(content)
+    document.body.appendChild(overlay)
+  }
+
+  // Crea la imatge amb el credit d'autor superposat. Fora del mode edicio,
+  // en clicar-la s'amplia (lightbox); en edicio el credit es editable.
+  function photoImage(obj, alt) {
+    var img = el('img', { src: obj.src, alt: alt || obj.alt || '', loading: 'lazy' })
+
+    if (!state.editing) {
+      img.classList.add('zoomable')
+      img.setAttribute('title', 'Clic para ampliar')
+      img.addEventListener('click', function () {
+        openLightbox(obj.src, obj.caption || '')
+      })
+      // Contenidor propi img+credit: el credit sempre queda sobre la foto,
+      // independentment del peu, i sense dependre de CSS :has().
+      var holder = el('div', { class: 'img-holder' }, [img])
+      if (obj.credit) {
+        holder.appendChild(el('span', { class: 'photo-credit', text: 'Foto: ' + obj.credit }))
+      }
+      return [holder]
+    }
+
+    // Mode edicio: casella d'autor en flux normal, sota la foto.
+    var creditInput = el('input', {
+      type: 'text', class: 'credit-input',
+      placeholder: 'Autor de la foto (ej: L. Ramírez)',
+      value: obj.credit || '',
+    })
+    creditInput.addEventListener('input', function () {
+      obj.credit = creditInput.value
+      markDirty()
+    })
+    return [img, creditInput]
+  }
+
   function renderImageBlock(block) {
     var figure = el('figure', { class: 'photo-wrap' })
 
     function paint() {
       figure.innerHTML = ''
       if (block.src) {
-        figure.appendChild(el('img', { src: block.src, alt: block.alt || '', loading: 'lazy' }))
+        photoImage(block).forEach(function (n) { figure.appendChild(n) })
       } else {
         figure.appendChild(el('div', {
           class: 'photo-empty',
@@ -243,9 +302,7 @@
       }
 
       images.forEach(function (img, index) {
-        var fig = el('figure', { class: 'photo-wrap' }, [
-          el('img', { src: img.src, alt: img.alt || '', loading: 'lazy' }),
-        ])
+        var fig = el('figure', { class: 'photo-wrap' }, photoImage(img))
         var caption = el('figcaption', { text: img.caption || '' })
         if (state.editing || img.caption) fig.appendChild(caption)
 
@@ -412,6 +469,8 @@
         el('ul', null, [
           el('li', { text: 'Haz clic sobre cualquier texto y escribe encima.' }),
           el('li', { text: 'Para las fotos, usa los botones «Cambiar foto» o «Poner foto».' }),
+          el('li', { text: 'En cada foto puedes escribir el autor en la casilla «Autor de la foto».' }),
+          el('li', { text: 'Los documentos PDF (anexos, informes) se suben con «Añadir documento PDF».' }),
           el('li', { text: 'Cuando acabes, pulsa el botón verde «Guardar cambios» de arriba.' }),
         ]),
       ]))
@@ -676,6 +735,20 @@
   navToggle.addEventListener('click', function () {
     var open = navEl.classList.toggle('open')
     navToggle.setAttribute('aria-expanded', open ? 'true' : 'false')
+  })
+
+  // ------------------------------------------------------- botó "tornar amunt"
+  // Els articles son molt llargs; un boto per tornar a dalt ajuda molt.
+  var toTop = el('button', {
+    type: 'button', class: 'to-top', 'aria-label': 'Volver arriba', text: '↑',
+  })
+  toTop.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  })
+  document.body.appendChild(toTop)
+  window.addEventListener('scroll', function () {
+    if (window.scrollY > 600) toTop.classList.add('visible')
+    else toTop.classList.remove('visible')
   })
 
   // ------------------------------------------------------------- arrencada

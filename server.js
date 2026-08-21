@@ -256,6 +256,7 @@ function mergeContent(current, incoming) {
         if (isSafeSrc(block.src)) dest.src = block.src
         if (typeof block.alt === 'string') dest.alt = stripTags(block.alt).slice(0, 300)
         if (typeof block.caption === 'string') dest.caption = stripTags(block.caption).slice(0, 300)
+        if (typeof block.credit === 'string') dest.credit = stripTags(block.credit).slice(0, 120)
       }
       if (dest.type === 'document') {
         if (isSafeSrc(block.src)) dest.src = block.src
@@ -269,6 +270,7 @@ function mergeContent(current, incoming) {
             src: im.src,
             alt: stripTags(im.alt || '').slice(0, 300),
             caption: stripTags(im.caption || '').slice(0, 300),
+            credit: stripTags(im.credit || '').slice(0, 120),
           }))
       }
     }

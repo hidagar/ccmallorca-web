@@ -138,6 +138,32 @@ figure img {
 }
 figcaption { font-size: .95rem; color: var(--ink-soft); padding-top: 10px; }
 
+/* Contenidor que embolcalla nomes la imatge, per poder-hi sobreposar
+   el credit d'autor sense que el peu de foto interfereixi. */
+.img-holder { position: relative; display: block; }
+
+/* Credit d'autor sobreposat a la foto, com feia la web original
+   ("Foto: L. Ramirez" a la cantonada). */
+.photo-credit {
+  position: absolute; left: 12px; bottom: 12px;
+  background: rgba(0,0,0,.62); color: #f3e6c8;
+  font-size: .8rem; font-style: italic;
+  padding: 4px 10px; border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Foto ampliable: cursor de lupa i lleuger efecte en passar per sobre. */
+img.zoomable { cursor: zoom-in; transition: filter .12s; }
+img.zoomable:hover { filter: brightness(1.05); }
+
+/* Casella d'autor en mode edicio */
+.credit-input {
+  font: inherit; font-size: .9rem; margin-top: 8px;
+  padding: 8px 12px; width: 100%; max-width: 320px;
+  border: 2px solid var(--paper-line); border-radius: var(--radius);
+}
+.credit-input:focus { border-color: var(--accent-dark); outline: none; }
+
 .photo-empty {
   display: flex; align-items: center; justify-content: center;
   min-height: 220px; border: 2px dashed var(--paper-line); border-radius: var(--radius);
@@ -326,6 +352,49 @@ body.editing .footer-text:hover { background: rgba(255,255,255,.12); }
 .help-note h2 { margin: 0 0 8px; font-size: 1.1rem; }
 .help-note ul { margin: 0; padding-left: 22px; }
 .help-note li { margin-bottom: 5px; }
+
+/* --------------------------------------------------- ampliar fotos (lightbox) */
+
+.lightbox {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(6,5,4,.94); padding: 24px; gap: 12px;
+}
+.lightbox-content {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  max-width: 100%; max-height: 100%;
+}
+.lightbox img {
+  max-width: 96vw; max-height: 86vh; width: auto; height: auto;
+  border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.6);
+}
+.lightbox-caption {
+  color: #f3e6c8; font-size: 1rem; text-align: center; margin: 0;
+  max-width: 800px;
+}
+.lightbox-close {
+  position: absolute; top: 16px; right: 20px;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(255,255,255,.12); color: #fff;
+  border: 1px solid rgba(255,255,255,.35);
+  font-size: 1.5rem; cursor: pointer; line-height: 1;
+}
+.lightbox-close:hover { background: rgba(255,255,255,.24); }
+
+/* ------------------------------------------------------ botó "tornar amunt" */
+
+.to-top {
+  position: fixed; right: 22px; bottom: 22px; z-index: 55;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--accent-dark); color: #fff;
+  border: none; font-size: 1.5rem; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,.4);
+  opacity: 0; visibility: hidden; transform: translateY(10px);
+  transition: opacity .18s, transform .18s, visibility .18s, background-color .12s;
+}
+.to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+.to-top:hover { background: var(--accent); }
+body.editing .to-top { display: none; }
 
 /* ------------------------------------------------------------------ mòbil */
 
