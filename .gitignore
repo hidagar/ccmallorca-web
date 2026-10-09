@@ -7,3 +7,7 @@ content.imported.json
 
 # Informe de disseny generat per analizar-diseno.mjs --json
 diseno-original.json
+
+# Configuracio local i fitxers pujats (mai al repositori)
+public/config.local.php
+public/uploads/

@@ -1,9 +1,14 @@
+# El fa servir cPanel (Git™ Version Control -> "Deploy HEAD Commit"):
+# copia la web a la carpeta del subdomini. Nomes AFEGEIX o SOBREESCRIU
+# fitxers del codi: uploads/ (fotos del client) i les dades de
+# ~/ccmallorca-data no es toquen mai.
+#
+# Si el subdomini te una altra carpeta (Dominios -> "Raíz del documento"),
+# canvia DEPLOYPATH.
 ---
-# Nomes l'utilitza cPanel (Git™ Version Control -> Deploy HEAD Commit).
-# Toca un fitxer dins de tmp/ perque Passenger reinicii l'app Node
-# automaticament despres de cada desplegament (conveni estandard de
-# Phusion Passenger).
 deployment:
   tasks:
-    - /bin/mkdir -p tmp
-    - /usr/bin/touch tmp/restart.txt
+    - export DEPLOYPATH=$HOME/beta.ccmallorca.net/
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/cp -R public/. $DEPLOYPATH
+    - /bin/cp content.default.json $DEPLOYPATH

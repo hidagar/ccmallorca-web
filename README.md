@@ -8,7 +8,7 @@ esquina), pero funcionando en móvil y tablet.
 
 - **Sin base de datos:** todo el contenido vive en un único `content.json`.
 - **Sin compilación:** HTML, CSS y JavaScript planos.
-- **Sin dependencias:** el servidor sólo usa módulos nativos de Node.
+- **Sin dependencias:** un único `api.php` en PHP plano, sin librerías.
 - **A prueba de errores:** el cliente puede cambiar textos y fotos, pero
   el servidor **no le deja tocar la estructura** de la web (ver más abajo).
 
@@ -19,14 +19,16 @@ proyecto.
 
 ## Publicar en cPanel (hosting real del cliente)
 
-Este repositorio es **público**, así que cPanel puede clonarlo sin pedir
-usuario ni token.
+Funciona en **PHP** (7.0 o superior, cualquier cPanel lo tiene). No hay
+que crear ninguna app ni reiniciar nada: son archivos que se copian a la
+carpeta del subdominio.
 
 ### 1. Subdominio de revisión
 
-**Dominios → Dominios** → crea `beta.ccmallorca.net` como subdominio, con
-su propio directorio (no compartas el "document root" con el dominio
-principal, para no tocar la web en producción).
+**Dominios → Dominios** → crea `beta.ccmallorca.net` con su propia
+carpeta. Fíjate en la **raíz del documento** que propone cPanel
+(normalmente `/home/TU_USUARIO/beta.ccmallorca.net`). Si es otra, cambia
+`DEPLOYPATH` en [`.cpanel.yml`](./.cpanel.yml).
 
 ### 2. Traer el código con Git Version Control
 
@@ -34,83 +36,57 @@ principal, para no tocar la web en producción).
 - Clone URL: `https://github.com/hidagar/ccmallorca-web.git`
 - Repository Path: `repositories/ccmallorca-web`
 
-Al clonar, entra en el repo y en "Pull or Deploy" pulsa **"Deploy HEAD
-Commit"** (ejecuta el `.cpanel.yml` de este repo, que solo sirve para que
-Passenger se reinicie solo en cada despliegue).
+Entra en el repo → **Pull or Deploy** → elige la rama → **"Deploy HEAD
+Commit"**. El `.cpanel.yml` copia la carpeta `public/` y
+`content.default.json` a la carpeta del subdominio.
 
-### 3. Crear la app Node con Setup Node.js App
+### 3. Primera visita: contraseñas
 
-**Software → Setup Node.js App → Create Application**:
-- **Node.js version**: la más reciente disponible; el código está escrito
-  en CommonJS puro y probado desde **Node 11 en adelante**, así que
-  funciona aunque el hosting solo ofrezca versiones antiguas
-- **Application mode**: Production
-- **Application root**: `repositories/ccmallorca-web`
-- **Application URL**: el subdominio `beta.ccmallorca.net`
-- **Application startup file**: `server.js`
-- **Environment variables**:
-  - `CCM_DATA_DIR` = una ruta **fuera** de `repositories/`, por ejemplo
-    `/home/TU_USUARIO/ccmallorca-data` (así el contenido y las fotos que
-    suba el cliente nunca se pierden al actualizar el código)
-  - `CCM_PASSWORD` = la contraseña del **cliente** (solo cambia textos y fotos)
-  - `CCM_ADMIN_PASSWORD` = **tu** contraseña de administrador (cambia la
-    estructura: crear/borrar páginas, añadir cajones, cabeceras…). Si no la
-    pones, se genera una al azar y aparece en el log de arranque de la app.
+La primera vez que se abre la web se crea sola la carpeta de datos
+**`/home/TU_USUARIO/ccmallorca-data`** (fuera de la parte pública):
+`content.json`, `config.json` y `backups/`.
 
-Guarda, pulsa **"Run NPM Install"** (no hay dependencias, pero cPanel lo
-pide para reconocer la app) y luego **"Start App"**.
+Las contraseñas iniciales se generan al azar y se apuntan en
+**`ccmallorca-data/CONTRASENAS.txt`** (ábrelo con el Administrador de
+archivos). Entra con la de administrador y cámbialas desde el botón
+**«🔑 Contraseñas»** del panel azul.
+
+Si prefieres elegirlas antes de la primera visita, copia
+`config.local.example.php` como `config.local.php` en la carpeta del
+subdominio y pon ahí las contraseñas (o una carpeta de datos distinta).
 
 ### 4. SSL
 
-**Seguridad → Let's Encrypt™ SSL** → emite certificado para
-`beta.ccmallorca.net`.
+**Seguridad → Let's Encrypt™ SSL** (o AutoSSL) para `beta.ccmallorca.net`.
 
 ### Actualizar tras cambios en el código
 
-Desde **Git™ Version Control**, entra en el repo → **"Pull or Deploy"** →
-**"Update from Remote"** y luego **"Deploy HEAD Commit"**. El `.cpanel.yml`
-reinicia la app sola; si no lo hace, usa el botón **"Restart"** en
-**Setup Node.js App**.
+**Git™ Version Control** → el repo → **Pull or Deploy** → **"Update from
+Remote"** y luego **"Deploy HEAD Commit"**. El despliegue solo copia el
+código: **no toca** las fotos que ha subido el cliente (`uploads/`) ni
+sus textos (`ccmallorca-data/`).
 
----
+### Qué va dónde
 
-<details>
-<summary>Alternativa: servidor propio con systemd + nginx (Linux/Ubuntu)</summary>
+| Dónde | Qué | ¿Se pisa al desplegar? |
+|---|---|---|
+| `beta.ccmallorca.net/` | `index.html`, `app.js`, `styles.css`, `api.php`… | Sí (es el código) |
+| `beta.ccmallorca.net/uploads/` | fotos y PDF que sube el cliente | No |
+| `~/ccmallorca-data/` | textos (`content.json`), contraseñas, copias de seguridad | No |
 
-```bash
-git clone https://github.com/hidagar/ccmallorca-web
-cd ccmallorca-web
-bash instalar-todo.sh LA_CONTRASEÑA_QUE_QUIERAS
-```
+> **Límites de subida:** `public/.user.ini` sube el límite de PHP a 25 MB
+> (los PDF pueden pesar hasta 20 MB). Si el hosting lo ignora, ajústalo en
+> **Software → MultiPHP INI Editor** (`upload_max_filesize` y
+> `post_max_size`).
 
-Ese script lo hace **todo**: crea el servicio systemd (puerto 5002) y los
-datos en `/var/www/ccmallorca-data`, pone la contraseña, **descarga
-ccmallorca.net e importa sus textos y fotos**, configura nginx (validando y
-deshaciendo el cambio si algo falla) y comprueba que todo responde.
-
-Para instalarla con el contenido de ejemplo en lugar del real:
+### Probarla en tu ordenador
 
 ```bash
-bash instalar-todo.sh CONTRASEÑA --sin-contenido
+php -S localhost:8000 -t public
 ```
 
-Paso a paso, si se prefiere hacerlo a mano:
-
-```bash
-bash setup.sh CONTRASEÑA          # servicio + datos
-bash mirror-original.sh --fotos   # copia de la web actual
-node import-original.mjs          # importar contenido real
-sudo node patch-nginx.mjs         # configurar nginx
-sudo nginx -t && sudo systemctl reload nginx
-```
-
-O añadir a mano el bloque de [`nginx-ccmallorca.conf`](./nginx-ccmallorca.conf)
-dentro del `server { ... }` de tu configuración de nginx.
-
-> **Importante:** el `client_max_body_size 12M;` es obligatorio. Sin él, nginx
-> rechaza las fotos grandes con un error 413.
-
-</details>
+y abre <http://localhost:8000>. Los datos se crean en `~/ccmallorca-data`
+(las contraseñas, en `~/ccmallorca-data/CONTRASENAS.txt`).
 
 ---
 
@@ -141,7 +117,7 @@ cambios sin guardar, el navegador le avisa.
 
 ## Modo administrador (para ti, el desarrollador)
 
-Entrando con la **contraseña de administrador** (`CCM_ADMIN_PASSWORD`), en
+Entrando con la **contraseña de administrador** (la de «Administrador» en `CONTRASENAS.txt`), en
 lugar de la del cliente, la barra superior se vuelve **azul** y aparecen los
 controles de estructura. Es la misma web, encima de la propia página (WYSIWYG):
 
@@ -166,7 +142,7 @@ controles de estructura. Es la misma web, encima de la propia página (WYSIWYG):
   puede cambiarla, pero solo el admin ponerla o quitarla.
 
 Cuando guardas como admin, se guarda la **estructura entera** (endpoint
-`/api/structure`). Lo que hagas aquí define qué puede editar luego el cliente:
+`api.php?r=structure`). Lo que hagas aquí define qué puede editar luego el cliente:
 él solo cambia los valores (textos y fotos) de los cajones que tú has puesto,
 nunca su disposición. Así se lo dejas montado como te pida y él solo rellena.
 
@@ -176,21 +152,12 @@ nunca su disposición. Así se lo dejas montado como te pida y él solo rellena.
 
 ### Cambiar la contraseña
 
-En cPanel, desde el **Terminal** si está disponible, o si no, cambiando
-temporalmente el `CCM_PASSWORD` en las variables de entorno de **Setup
-Node.js App** y reiniciando — pero eso solo aplica en la primera instalación
-(luego la contraseña vive cifrada en `config.json`, dentro de `CCM_DATA_DIR`).
-Para cambiarla en caliente hace falta ejecutar:
+En modo administrador, panel azul → **«🔑 Contraseñas»**: eliges la del
+cliente o la tuya y escribes la nueva. No hace falta terminal ni cPanel.
 
-```bash
-# contraseña del cliente
-CCM_DATA_DIR=/ruta/a/ccmallorca-data node server.js --set-password NUEVA
-# tu contraseña de administrador
-CCM_DATA_DIR=/ruta/a/ccmallorca-data node server.js --set-admin-password NUEVA
-```
-
-y reiniciar la app (botón "Restart" en Setup Node.js App, o
-`sudo systemctl restart ccmallorca` en la instalación con systemd).
+Si olvidas la de administrador: borra `~/ccmallorca-data/config.json`
+con el Administrador de archivos y abre la web. Se generan contraseñas
+nuevas en `CONTRASENAS.txt` (los textos y las fotos no se tocan).
 
 ---
 
@@ -210,19 +177,20 @@ estructura está garantizada desde el servidor.
 | Poner enlaces, negrita, cursiva y listas | |
 
 Además, cada vez que guarda se hace una **copia de seguridad** automática en
-`CCM_DATA_DIR/backups/` (se conservan las 30 últimas).
+`ccmallorca-data/backups/` (se conservan las 30 últimas).
 
 ---
 
 ## Cómo se importa el contenido real
 
-`instalar-todo.sh` ya lo hace (en la instalación con systemd), pero se puede
-repetir cuando se quiera:
+Es una herramienta para **tu ordenador** (necesita Node, la web no). Se
+genera el contenido en local y luego se suben `content.json` a
+`~/ccmallorca-data/` y las fotos a `uploads/` del subdominio:
 
 ```bash
 bash mirror-original.sh --fotos   # descarga ccmallorca.net
 node import-original.mjs --dry    # prueba, no toca nada
-node import-original.mjs          # aplica de verdad
+CCM_DATA_DIR=./salida CCM_UPLOADS_DIR=./salida/uploads node import-original.mjs
 ```
 
 El importador entiende el HTML que genera FrontPage:

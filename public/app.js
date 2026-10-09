@@ -85,6 +85,29 @@
     })
   }
 
+  // Puja un fitxer (dataURL) com a multipart/form-data: ocupa menys que
+  // el base64 dins d'un JSON i PHP el rep directament a $_FILES.
+  function uploadFile(name, dataUrl, kind) {
+    var parts = dataUrl.split(',')
+    var mime = (/^data:([^;]+)/.exec(parts[0]) || [])[1] || 'application/octet-stream'
+    var bin = atob(parts[1] || '')
+    var bytes = new Uint8Array(bin.length)
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
+    var form = new FormData()
+    form.append('file', new Blob([bytes], { type: mime }), name)
+    form.append('name', name)
+    form.append('kind', kind)
+    return fetch('api.php?r=upload', { method: 'POST', body: form, credentials: 'same-origin' })
+      .then(function (res) {
+        return res.json().catch(function () { return {} }).then(function (data) {
+          if (!res.ok) {
+            throw new Error(data.error || (res.status === 413 ? 'El archivo es demasiado grande' : 'Error de conexión'))
+          }
+          return data
+        })
+      })
+  }
+
   function markDirty() {
     state.dirty = true
     updateEditbar()
@@ -220,7 +243,7 @@
             ? 'Subiendo foto ' + (i + 1) + ' de ' + list.length + '…'
             : 'Subiendo la foto…')
           return prepareImage(picked).then(function (ready) {
-            return api('POST', 'api/upload', { name: ready.name, data: ready.data })
+            return uploadFile(ready.name, ready.data, 'image')
               .then(function (res) { done.push({ src: res.src, ratio: ready.ratio }) })
           }).catch(function (err) {
             toast(picked.name + ': ' + err.message, 'err')
@@ -243,11 +266,7 @@
       var picked = list[0]
       if (!picked) return null
       toast('Subiendo el documento…')
-      return api('POST', 'api/upload', {
-        name: picked.name,
-        data: picked.data,
-        kind: 'document',
-      }).then(function (res) {
+      return uploadFile(picked.name, picked.data, 'document').then(function (res) {
         toast('Documento subido', 'ok')
         return { src: res.src, name: picked.name }
       }).catch(function (err) {
@@ -942,6 +961,7 @@
       ]),
       el('div', { class: 'admin-row' }, [
         el('button', { type: 'button', class: 'btn btn-admin btn-sm', text: '+ Crear página nueva', onclick: createPage }),
+        el('button', { type: 'button', class: 'btn btn-ghost btn-sm', text: '🔑 Contraseñas', onclick: changePasswords }),
         el('button', {
           type: 'button', class: 'btn btn-danger btn-sm', text: '🗑 Borrar esta página',
           disabled: menu.length <= 1,
@@ -949,6 +969,41 @@
         }),
       ]),
     ])
+  }
+
+  // Canviar les contrasenyes des de la web (sense terminal ni cPanel)
+  function changePasswords() {
+    var overlay = el('div', { class: 'overlay' })
+    var error = el('p', { class: 'dialog-error' })
+    var who = el('select', { class: 'admin-select', id: 'ccmWho' }, [
+      el('option', { value: 'editor', text: 'La del cliente (edita textos y fotos)' }),
+      el('option', { value: 'admin', text: 'La mía de administrador' }),
+    ])
+    var pw = el('input', { type: 'text', id: 'ccmNewPwd', autocomplete: 'new-password', placeholder: 'Mínimo 6 caracteres' })
+    function close() { overlay.remove() }
+    function submit() {
+      error.textContent = ''
+      api('POST', 'api.php?r=password', { who: who.value, password: pw.value }).then(function () {
+        close()
+        toast('Contraseña cambiada', 'ok')
+      }).catch(function (err) { error.textContent = err.message })
+    }
+    pw.addEventListener('keydown', function (e) { if (e.key === 'Enter') submit() })
+    overlay.appendChild(el('div', { class: 'dialog', role: 'dialog', 'aria-modal': 'true' }, [
+      el('h2', { text: 'Cambiar contraseña' }),
+      el('label', { for: 'ccmWho', text: '¿Cuál?' }),
+      who,
+      el('label', { for: 'ccmNewPwd', text: 'Contraseña nueva', style: 'margin-top:14px' }),
+      pw,
+      error,
+      el('div', { class: 'dialog-actions' }, [
+        el('button', { type: 'button', class: 'btn btn-ghost', text: 'Cancelar', onclick: close }),
+        el('button', { type: 'button', class: 'btn btn-primary', text: 'Cambiar', onclick: submit }),
+      ]),
+    ]))
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) close() })
+    document.body.appendChild(overlay)
+    pw.focus()
   }
 
   function createPage() {
@@ -1172,7 +1227,7 @@
     state.saving = true
     updateEditbar()
     // L'admin guarda l'estructura sencera; el client nomes els valors.
-    var endpoint = state.admin ? 'api/structure' : 'api/content'
+    var endpoint = state.admin ? 'api.php?r=structure' : 'api.php?r=content'
     api('PUT', endpoint, state.content).then(function (res) {
       state.content = res.content
       // La pagina actual pot haver canviat d'slug (l'admin pot haver-la
@@ -1217,7 +1272,7 @@
 
   function exitEditing() {
     if (state.dirty && !confirm('Tienes cambios sin guardar. ¿Salir y perderlos?')) return
-    api('POST', 'api/logout').catch(function () {})
+    api('POST', 'api.php?r=logout').catch(function () {})
     state.editing = false
     state.admin = false
     state.dirty = false
@@ -1248,7 +1303,7 @@
 
     function submit() {
       error.textContent = ''
-      api('POST', 'api/login', { password: input.value }).then(function (res) {
+      api('POST', 'api.php?r=login', { password: input.value }).then(function (res) {
         close()
         enterEditing(res.role)
         toast(res.role === 'admin' ? 'Modo administrador' : 'Ya puedes editar la web', 'ok')
@@ -1308,7 +1363,7 @@
   // ------------------------------------------------------------- arrencada
 
   function loadContent() {
-    return fetch('content.json?t=' + Date.now(), { credentials: 'same-origin' })
+    return fetch('api.php?r=content&t=' + Date.now(), { credentials: 'same-origin' })
       .then(function (r) { return r.json() })
       .then(function (data) {
         state.content = data
@@ -1321,7 +1376,7 @@
     render()
     // Si ja hi ha sessio oberta (o s'ha entrat amb ?edit=1) passem a mode edicio
     var wants = location.search.indexOf('edit=1') !== -1 || location.hash === '#edit'
-    return api('GET', 'api/session').then(function (s) {
+    return api('GET', 'api.php?r=session').then(function (s) {
       if (s.authenticated) enterEditing(s.role)
       else if (wants) askPassword()
     }).catch(function () {})

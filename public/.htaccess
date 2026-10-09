@@ -1,0 +1,24 @@
+# CC Mallorca — configuracio minima d'Apache/LiteSpeed (tot opcional).
+DirectoryIndex index.html
+
+# No llistar carpetes (uploads/ te a mes un index.html buit)
+<IfModule mod_autoindex.c>
+  Options -Indexes
+</IfModule>
+
+# Fitxers que no s'han de poder descarregar
+<FilesMatch "^(\.user\.ini|config\.local\.php|content\.default\.json)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</FilesMatch>
+
+# Les fotos i PDF pujats no canvien mai de nom: memoria cau llarga
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/gif "access plus 30 days"
+  ExpiresByType application/pdf "access plus 30 days"
+</IfModule>
