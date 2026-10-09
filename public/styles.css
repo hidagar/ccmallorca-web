@@ -1,203 +1,244 @@
-/* CC Mallorca — estils de la web publica i del mode edicio */
+/* CC Mallorca — estils de la web publica i del mode edicio.
 
-/* Paleta basada en la web original (fons negre, textos daurats/ambre i
-   caixes de contingut clares): mantenim la identitat pero amb un disseny
-   fluid i llegible. */
+   Reprodueix l'aspecte de la web original feta amb FrontPage: fons negre,
+   columna central de 900px, baner per seccio, menu en lletra Book Antiqua
+   daurada, textos petits justificats en to crema i fotos en mosaic amb
+   el credit de l'autor a la cantonada. Pero fluid: funciona en mobil. */
+
 :root {
+  --bg: #000;
+  --gold: #dda74d;         /* enllaços i menu (color original) */
+  --gold-light: #e3b971;
+  --gold-dark: #865e1a;    /* seccio actual del menu */
+  --text: #d7b893;         /* text sobre negre (color original) */
+  --hl: #f3d27a;           /* negretes, com els destacats de l'original */
+  --frame: #8c8271;        /* vora fina de les fotos */
+  --paper: #fff;
+  --paper-ink: #111;
+  --paper-line: #f2eadb;
   --ink: #241f1a;
   --ink-soft: #5c5347;
-  --bg: #0b0a09;
-  --bg-elevated: #18130f;
-  --paper: #faf6ec;
-  --paper-line: #e4dbc7;
   --line: #3a3126;
-  --accent: #d7a34b;
-  --accent-soft: #f0cf8f;
-  --accent-dark: #a9762a;
-  --clay: #a9762a;
   --edit: #b8860b;
   --edit-bg: #fdf7e3;
   --ok: #2f8f5b;
   --err: #c0392b;
-  --radius: 10px;
-  --wrap: 1080px;
+  --radius: 8px;
+  --sheet: 900px;
+  --serif: "Book Antiqua", "Palatino Linotype", Palatino, "URW Palladio L", Georgia, serif;
+  --sans: Arial, Helvetica, "Liberation Sans", sans-serif;
 }
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; background: var(--bg); }
 
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--accent-soft);
-  font-family: Arial, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 18px;
-  line-height: 1.65;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-.wrap { width: 100%; max-width: var(--wrap); margin: 0 auto; padding: 0 20px; }
-
 img { max-width: 100%; height: auto; display: block; }
 
-a { color: var(--accent); }
-a:hover { color: var(--accent-soft); }
+a { color: var(--gold); }
+a:hover { color: var(--gold-light); }
 
 .skip-link {
   position: absolute; left: -9999px; top: 0;
-  background: var(--accent); color: #fff; padding: 12px 18px; z-index: 100;
+  background: var(--gold); color: #000; padding: 12px 18px; z-index: 100;
 }
 .skip-link:focus { left: 0; }
 
-:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 
-/* ---------------------------------------------------------------- capçalera */
+/* Columna central, com les taules de 900px de l'original */
+.sheet { max-width: var(--sheet); margin: 0 auto; padding: 4px 0 0; }
 
-.site-header {
-  background: linear-gradient(160deg, #100d0a 0%, var(--bg-elevated) 100%);
-  color: var(--accent-soft);
-  border-bottom: 4px solid var(--accent-dark);
+/* ------------------------------------------------------------------ baner */
+
+.banner { position: relative; }
+.banner img { width: 100%; display: block; }
+
+/* Baner generat quan la pagina no te imatge propia: imita les tires de
+   roca daurada de l'original (900x60) amb el nom de la seccio. */
+.banner-fallback {
+  position: relative; overflow: hidden;
+  height: clamp(44px, 6.7vw, 60px);
+  display: flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(ellipse 18% 70% at 8% 40%, rgba(240,190,90,.75), transparent 70%),
+    radial-gradient(ellipse 14% 60% at 30% 70%, rgba(200,140,50,.6), transparent 70%),
+    radial-gradient(ellipse 20% 80% at 55% 30%, rgba(120,80,30,.7), transparent 70%),
+    radial-gradient(ellipse 16% 70% at 78% 60%, rgba(230,170,70,.55), transparent 70%),
+    radial-gradient(ellipse 12% 60% at 95% 35%, rgba(170,110,40,.6), transparent 70%),
+    repeating-linear-gradient(100deg, rgba(0,0,0,.18) 0 3px, transparent 3px 9px),
+    linear-gradient(90deg, #6b4a1e, #a87a33 25%, #4a3214 50%, #9c6f2c 75%, #3b2a12);
 }
-
-.header-inner {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; padding-top: 20px; padding-bottom: 20px;
-}
-
-.brand { display: flex; align-items: center; gap: 14px; }
-.brand-mark { color: var(--accent); display: flex; }
-.brand-text { display: flex; flex-direction: column; }
-.brand-title { font-size: 1.7rem; font-weight: 700; letter-spacing: .01em; line-height: 1.2; color: var(--accent); }
-.brand-subtitle { font-size: .95rem; color: #cbb98a; }
-
-.nav-toggle {
-  display: none; background: rgba(215,163,75,.14); color: var(--accent-soft);
-  border: 1px solid rgba(215,163,75,.4); border-radius: var(--radius);
-  padding: 10px 16px; font-size: 1rem; cursor: pointer; font-family: inherit;
-}
-
-.site-nav { background: #0d0b08; }
-.nav-list {
-  display: flex; flex-wrap: wrap; gap: 2px;
-  list-style: none; margin: 0; padding: 0 20px;
-}
-.nav-list a {
-  display: block; padding: 14px 18px; color: #cbb98a;
-  text-decoration: none; font-size: 1rem; border-bottom: 3px solid transparent;
-}
-.nav-list a:hover { background: rgba(215,163,75,.08); color: var(--accent-soft); }
-.nav-list a[aria-current="page"] {
-  color: var(--accent); border-bottom-color: var(--accent); background: rgba(215,163,75,.06);
-}
-
-/* ------------------------------------------------------------------ pagina */
-
-.page { padding: 32px 20px 64px; min-height: 50vh; }
-.loading { color: var(--accent-soft); padding: 0 20px; }
-
-/* Caixa de contingut clara, com feia la web original amb les seves
-   taules blanques, pero ara fluida i sense amplada fixa. */
-.page-inner {
-  background: var(--paper);
-  color: var(--ink);
-  border-radius: 14px;
-  border: 1px solid var(--paper-line);
-  box-shadow: 0 12px 30px rgba(0,0,0,.35);
-  padding: 32px clamp(20px, 5vw, 56px) 48px;
-}
-
-.page-title {
-  font-size: 2rem; line-height: 1.25; margin: 0 0 8px;
-  padding-bottom: 14px; border-bottom: 2px solid var(--paper-line);
-  color: var(--ink);
-}
-.page-intro { font-size: 1.1rem; color: var(--ink-soft); margin: 14px 0 34px; font-style: italic; }
-.page-intro p { margin: 0 0 10px; }
-
-.block { margin: 0 0 28px; }
-.block h2 {
-  font-size: 1.4rem; margin: 36px 0 12px; color: var(--accent-dark);
-}
-.block-text { color: var(--ink); }
-.block-text p { margin: 0 0 16px; text-align: justify; }
-.block-text ul, .block-text ol { margin: 0 0 16px; padding-left: 26px; }
-.block-text li { margin-bottom: 8px; }
-.block-text blockquote {
-  margin: 0 0 16px; padding: 12px 20px;
-  border-left: 4px solid var(--accent-dark); background: #f1e9d3; color: var(--ink-soft);
-}
-
-figure { margin: 0 0 28px; }
-/* Alçada limitada: aixi una foto petita o vertical no descuadra la pagina,
-   pugi el client el que pugi. */
-figure img {
-  width: 100%; border-radius: var(--radius);
-  border: 1px solid var(--paper-line); background: #f1ecdd;
-  max-height: 30rem; object-fit: contain;
-}
-figcaption { font-size: .95rem; color: var(--ink-soft); padding-top: 10px; }
-
-/* Contenidor que embolcalla nomes la imatge, per poder-hi sobreposar
-   el credit d'autor sense que el peu de foto interfereixi. */
-.img-holder { position: relative; display: block; }
-
-/* Credit d'autor sobreposat a la foto, com feia la web original
-   ("Foto: L. Ramirez" a la cantonada). */
-.photo-credit {
-  position: absolute; left: 12px; bottom: 12px;
-  background: rgba(0,0,0,.62); color: #f3e6c8;
-  font-size: .8rem; font-style: italic;
-  padding: 4px 10px; border-radius: 6px;
+.banner-fallback::after {
+  /* vores fosques com la imatge original */
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,.55), transparent 12%, transparent 88%, rgba(0,0,0,.55));
   pointer-events: none;
 }
-
-/* Foto ampliable: cursor de lupa i lleuger efecte en passar per sobre. */
-img.zoomable { cursor: zoom-in; transition: filter .12s; }
-img.zoomable:hover { filter: brightness(1.05); }
-
-/* Casella d'autor en mode edicio */
-.credit-input {
-  font: inherit; font-size: .9rem; margin-top: 8px;
-  padding: 8px 12px; width: 100%; max-width: 320px;
-  border: 2px solid var(--paper-line); border-radius: var(--radius);
+.banner-text {
+  position: relative; z-index: 1;
+  font-family: "Century Gothic", "Avant Garde", "Trebuchet MS", var(--sans);
+  font-size: clamp(1.2rem, 4vw, 1.9rem); letter-spacing: .06em;
+  color: #f4ede0; text-shadow: 0 1px 3px #000, 0 0 10px rgba(0,0,0,.6);
+  padding: 0 12px; text-align: center; line-height: 1.1;
 }
-.credit-input:focus { border-color: var(--accent-dark); outline: none; }
+
+/* ------------------------------------------------------------------- menu */
+
+.site-nav { margin: 6px 0 4px; }
+.nav-list {
+  display: flex; flex-wrap: wrap; justify-content: space-around;
+  list-style: none; margin: 0; padding: 0 8px; gap: 2px 8px;
+}
+.nav-list a {
+  display: block; padding: 4px 8px;
+  font-family: var(--serif); font-size: 1.15rem;
+  color: var(--gold); text-decoration: none; text-transform: lowercase;
+}
+.nav-list a:hover { color: var(--gold-light); text-decoration: underline; }
+.nav-list a[aria-current="page"] { color: var(--gold-dark); text-decoration: underline; }
+
+/* ----------------------------------------------------------------- pagina */
+
+.page { padding: 4px 0 24px; min-height: 50vh; }
+.loading { text-align: center; }
+
+/* Contenidor de calaixos: els calaixos "mitja amplada" queden de dos en dos */
+.page-inner {
+  display: flex; flex-wrap: wrap; align-items: flex-start;
+  column-gap: 22px;
+}
+.page-inner > * { flex: 1 1 100%; min-width: 0; }
+.page-inner > .half { flex: 1 1 calc(50% - 11px); }
+
+.page-title {
+  font-family: var(--serif); font-weight: normal; text-align: center;
+  font-size: 1.75rem; line-height: 1.25; color: var(--gold-light);
+  margin: 10px 0 12px;
+}
+.page-intro { text-align: center; margin: 0 0 14px; }
+.page-intro p { margin: 0 0 6px; }
+
+.block { margin: 0 0 12px; }
+.block h2 {
+  font-size: 1.15rem; font-weight: bold; margin: 18px 0 6px; color: var(--gold-light);
+}
+.block-text p { margin: 0 0 4px; text-align: justify; text-indent: 1.4em; }
+.block-text strong, .block-text b { color: var(--hl); }
+.block-text ul, .block-text ol { margin: 0 0 8px; padding-left: 26px; text-align: left; }
+.block-text li { margin-bottom: 4px; }
+.block-text blockquote {
+  margin: 0 0 8px; padding: 6px 16px; border-left: 3px solid var(--gold-dark); font-style: italic;
+}
+
+/* Estil "hoja blanca" (com la pagina d'Articles original): caixa blanca
+   amb vora clara i text negre. */
+.theme-papel .page-inner {
+  background: var(--paper); color: var(--paper-ink);
+  border: 2px solid var(--paper-line); outline: 1px solid #fff; outline-offset: 2px;
+  padding: 14px clamp(12px, 3vw, 24px) 24px; margin: 2px 2px 0;
+}
+.theme-papel .page-title { color: var(--paper-ink); font-family: var(--sans); }
+.theme-papel .block h2 { color: var(--paper-ink); font-weight: normal; font-size: 1.2rem; }
+.theme-papel .block-text strong, .theme-papel .block-text b { color: inherit; }
+.theme-papel a { color: #1a3fb0; }
+.theme-papel figcaption { color: var(--paper-ink); font-weight: bold; }
+
+/* ------------------------------------------------------------------ fotos */
+
+figure { margin: 0 0 10px; }
+figcaption { font-size: .9rem; text-align: center; padding-top: 6px; font-style: italic; }
+
+/* Foto amb vora fina, com les taules amb bordercolor de l'original */
+.tile {
+  position: relative; display: block; overflow: hidden;
+  border: 1px solid var(--frame); background: #111;
+}
+.tile img { width: 100%; height: 100%; object-fit: cover; }
+.photo-single .tile img { height: auto; max-height: 90vh; object-fit: contain; }
+
+/* Credit d'autor a la cantonada ("Fotos, L. Ramírez") */
+.photo-credit {
+  position: absolute; left: 6px; bottom: 4px;
+  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  font-size: .78rem; color: #f2e2b8;
+  text-shadow: 0 0 3px #000, 0 1px 2px #000;
+  pointer-events: none; line-height: 1.2;
+}
+
+img.zoomable { cursor: zoom-in; transition: filter .12s; }
+img.zoomable:hover { filter: brightness(1.08); }
 
 .photo-empty {
   display: flex; align-items: center; justify-content: center;
-  min-height: 220px; border: 2px dashed var(--paper-line); border-radius: var(--radius);
-  background: #f1ecdd; color: var(--ink-soft); text-align: center; padding: 20px;
+  min-height: 200px; border: 2px dashed var(--frame);
+  background: #15110c; color: var(--text); text-align: center; padding: 20px;
 }
+.theme-papel .photo-empty { background: #f6f1e4; color: var(--ink-soft); }
 
-.gallery {
-  display: grid; gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+/* Mosaics: files justificades (totes les fotos de la fila a la mateixa
+   alçada, amplades segons la proporcio) i blocs "dues apilades + una alta". */
+.mosaic { display: flex; flex-direction: column; gap: 2px; }
+.mrow { display: flex; gap: 2px; align-items: stretch; }
+.mrow > .tile { flex-basis: 0; min-width: 0; }
+.mcol { display: flex; flex-direction: column; gap: 2px; flex-basis: 0; min-width: 0; }
+.mcol > .tile { flex: 0 0 auto; }
+.mtall { flex-basis: 0; min-width: 0; }
+.mtall > .tile { height: 100%; }
+
+/* Graella clàssica amb peus de foto */
+.gallery-grid {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
-.gallery figure { margin: 0; }
-.gallery img { aspect-ratio: 4 / 3; object-fit: cover; max-height: none; }
-.gallery-empty { grid-column: 1 / -1; }
+.gallery-grid figure { margin: 0; }
+.gallery-grid .tile { aspect-ratio: 4 / 3; }
+
+/* ------------------------------------------------------------- documents */
+
+.doc-wrap { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.doc-link {
+  display: block; width: 100%; text-align: center;
+  border: 1px solid var(--gold-dark); padding: 6px 12px;
+  font-family: var(--serif); font-size: 1.5rem; color: #3060ff; text-decoration: none;
+}
+.doc-link:hover { text-decoration: underline; color: #6f8fff; }
+.doc-icon { font-size: 1.1rem; margin-right: 8px; vertical-align: middle; }
+.doc-empty {
+  width: 100%; padding: 12px 16px; border: 2px dashed var(--frame);
+  color: var(--text); text-align: center;
+}
+.theme-papel .doc-empty { color: var(--ink-soft); }
+.doc-label-input {
+  font: inherit; font-size: 1rem; padding: 10px 14px;
+  border: 2px solid var(--paper-line); border-radius: var(--radius);
+  width: 100%; max-width: 420px;
+}
+.doc-label-input:focus { border-color: var(--edit); outline: none; }
 
 /* -------------------------------------------------------------------- peu */
 
-.site-footer {
-  background: var(--bg-elevated); color: #cbb98a;
-  margin-top: 40px; padding: 26px 0; font-size: .95rem;
-  border-top: 1px solid rgba(215,163,75,.25);
-}
-.footer-inner {
-  display: flex; flex-wrap: wrap; gap: 10px 20px;
-  align-items: center; justify-content: space-between;
-}
-.footer-text { margin: 0; }
-.footer-meta { margin: 0; display: flex; align-items: center; gap: 10px; }
-.site-footer a { color: var(--accent); }
+.site-footer { text-align: center; padding: 6px 12px 22px; }
+.site-footer p { margin: 0; }
+.footer-text { font-family: "Times New Roman", var(--serif); font-size: 1.2rem; color: #fff; }
+.footer-mail a { font-size: .95rem; }
+.footer-edit { margin-top: 14px !important; }
 
 .edit-entry {
-  background: none; border: none; color: var(--accent);
-  font: inherit; cursor: pointer; text-decoration: underline; padding: 0;
+  background: none; border: none; color: #6d6150;
+  font: inherit; font-size: .85rem; cursor: pointer; text-decoration: underline; padding: 4px;
 }
-.edit-entry:hover { color: var(--accent-soft); }
+.edit-entry:hover { color: var(--gold); }
 
 /* --------------------------------------------------------------- mode edicio */
 
@@ -241,17 +282,13 @@ body.editing [data-editable] {
 }
 body.editing [data-editable]:hover { outline-color: var(--edit); background: rgba(184,134,11,.06); }
 body.editing [data-editable]:focus {
-  outline: 3px solid var(--edit); background: #fffdf5;
+  outline: 3px solid var(--edit); background: rgba(184,134,11,.10);
 }
+body.editing .theme-papel [data-editable]:focus { background: #fffdf5; }
 body.editing [data-editable]:empty::before {
   content: "Escribe aquí…"; color: #9a8f77;
 }
 
-body.editing .brand-title, body.editing .brand-subtitle, body.editing .footer-text {
-  outline-color: rgba(255,255,255,.5);
-}
-body.editing .brand-title:hover, body.editing .brand-subtitle:hover,
-body.editing .footer-text:hover { background: rgba(255,255,255,.12); }
 
 /* Botons sobre les fotos */
 .photo-wrap { position: relative; }
@@ -276,26 +313,6 @@ body.editing .footer-text:hover { background: rgba(255,255,255,.12); }
 }
 .gallery-add:hover { background: #fbf2d8; }
 
-/* Documents PDF */
-.doc-wrap { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
-.doc-link {
-  display: inline-flex; align-items: center; gap: 12px;
-  background: #f1ecdd; border: 2px solid var(--paper-line); border-radius: var(--radius);
-  padding: 14px 20px; text-decoration: none; color: var(--ink); font-weight: 600;
-  font-size: 1.05rem; transition: background-color .12s, border-color .12s;
-}
-.doc-link:hover { background: #ece4cd; border-color: var(--accent-dark); color: var(--ink); }
-.doc-icon { font-size: 1.6rem; }
-.doc-empty {
-  padding: 16px 20px; border: 2px dashed var(--paper-line); border-radius: var(--radius);
-  background: #f1ecdd; color: var(--ink-soft); font-size: 1rem;
-}
-.doc-label-input {
-  font: inherit; font-size: 1rem; padding: 10px 14px;
-  border: 2px solid var(--paper-line); border-radius: var(--radius);
-  width: 100%; max-width: 380px;
-}
-.doc-label-input:focus { border-color: var(--accent-dark); outline: none; }
 /* Els documents no tenen foto a sota: els botons van en flux normal,
    no superposats com als blocs d'imatge. */
 .doc-wrap .photo-actions { position: static; inset: auto; justify-content: flex-start; }
@@ -407,75 +424,110 @@ body.editing .footer-text:hover { background: rgba(255,255,255,.12); }
 .add-block p { margin: 0 0 10px; font-weight: 700; color: #234b70; }
 .add-block-btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 
-.page-header-img { margin: 0; position: relative; }
-.page-header-img img {
-  width: 100%; max-height: 240px; object-fit: cover;
-  border-radius: 12px 12px 0 0; display: block; border: 1px solid var(--paper-line);
+
+/* Llista d'edicio de la galeria (sota la vista previa del mosaic) */
+.gal-edit {
+  margin-top: 10px; padding: 12px; border: 2px dashed var(--edit);
+  border-radius: var(--radius); background: var(--edit-bg); color: var(--ink);
 }
-.page-inner.has-header { border-top-left-radius: 0; border-top-right-radius: 0; }
+.gal-edit-title { margin: 0 0 10px; font-weight: 700; }
+.gal-item {
+  display: grid; grid-template-columns: 96px 1fr; gap: 6px 12px;
+  align-items: start; padding: 10px 0; border-top: 1px solid #e3d5a8;
+}
+.gal-item:first-of-type { border-top: none; }
+.gal-thumb { width: 96px; height: 72px; object-fit: cover; border: 1px solid var(--frame); }
+.gal-fields { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.gal-fields input {
+  font: inherit; font-size: .95rem; padding: 7px 10px; width: 100%;
+  border: 2px solid #e3d5a8; border-radius: 6px; background: #fff; color: var(--ink);
+}
+.gal-fields input:focus { border-color: var(--edit); outline: none; }
+.gal-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.gal-btns .photo-btn { padding: 6px 10px; font-size: .9rem; box-shadow: none; border-width: 1px; }
+.gal-edit .gallery-add { width: 100%; min-height: 64px; margin-top: 10px; }
+
+/* Controls d'edicio sobre el baner */
+.banner .photo-actions { bottom: 6px; right: 6px; }
+.banner .photo-btn { padding: 5px 10px; font-size: .85rem; }
+.banner-empty-admin {
+  border: 2px dashed #2f6fb0; padding: 8px; margin-top: 4px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: #eef4fb; color: #234b70; font-size: .9rem;
+}
+
+.admin-select {
+  font: inherit; font-size: .9rem; padding: 5px 8px; border: 1px solid #cbdcef;
+  border-radius: 6px; color: #234b70; background: #fff;
+}
 
 /* --------------------------------------------------- ampliar fotos (lightbox) */
 
 .lightbox {
   position: fixed; inset: 0; z-index: 100;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: rgba(6,5,4,.94); padding: 24px; gap: 12px;
+  background: rgba(0,0,0,.95); padding: 24px 60px; gap: 12px;
+  touch-action: pan-y;
 }
 .lightbox-content {
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
   max-width: 100%; max-height: 100%;
 }
 .lightbox img {
-  max-width: 96vw; max-height: 86vh; width: auto; height: auto;
-  border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.6);
+  max-width: 92vw; max-height: 84vh; width: auto; height: auto;
+  border: 1px solid var(--frame); box-shadow: 0 10px 40px rgba(0,0,0,.6);
 }
-.lightbox-caption {
-  color: #f3e6c8; font-size: 1rem; text-align: center; margin: 0;
-  max-width: 800px;
-}
-.lightbox-close {
-  position: absolute; top: 16px; right: 20px;
-  width: 48px; height: 48px; border-radius: 50%;
-  background: rgba(255,255,255,.12); color: #fff;
+.lightbox-caption { color: var(--text); font-size: 1rem; text-align: center; margin: 0; max-width: 800px; }
+.lightbox-count { color: #8c8271; font-size: .85rem; margin: 0; }
+.lightbox-close, .lightbox-nav {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,.10); color: #fff;
   border: 1px solid rgba(255,255,255,.35);
-  font-size: 1.5rem; cursor: pointer; line-height: 1;
+  cursor: pointer; line-height: 1;
 }
-.lightbox-close:hover { background: rgba(255,255,255,.24); }
+.lightbox-close { top: 14px; right: 16px; width: 48px; height: 48px; font-size: 1.5rem; }
+.lightbox-nav { top: 50%; transform: translateY(-50%); width: 52px; height: 52px; font-size: 1.8rem; }
+.lightbox-nav.prev { left: 8px; }
+.lightbox-nav.next { right: 8px; }
+.lightbox-close:hover, .lightbox-nav:hover { background: rgba(255,255,255,.24); }
 
 /* ------------------------------------------------------ botó "tornar amunt" */
 
 .to-top {
-  position: fixed; right: 22px; bottom: 22px; z-index: 55;
-  width: 52px; height: 52px; border-radius: 50%;
-  background: var(--accent-dark); color: #fff;
-  border: none; font-size: 1.5rem; cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0,0,0,.4);
+  position: fixed; right: 18px; bottom: 18px; z-index: 55;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: #2a2016; color: var(--gold);
+  border: 1px solid var(--gold-dark); font-size: 1.4rem; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,.6);
   opacity: 0; visibility: hidden; transform: translateY(10px);
   transition: opacity .18s, transform .18s, visibility .18s, background-color .12s;
 }
 .to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
-.to-top:hover { background: var(--accent); }
+.to-top:hover { background: #3a2c1c; }
 body.editing .to-top { display: none; }
 
 /* ------------------------------------------------------------------ mòbil */
 
 @media (max-width: 760px) {
-  body { font-size: 17px; }
-  .nav-toggle { display: block; }
-  .site-nav { display: none; }
-  .site-nav.open { display: block; }
-  .nav-list { flex-direction: column; padding: 6px 20px 14px; }
-  .nav-list a { padding: 13px 10px; border-bottom: 1px solid rgba(255,255,255,.08); }
-  .nav-list a[aria-current="page"] { border-bottom-color: var(--clay); }
-  .page-title { font-size: 1.7rem; }
-  .brand-title { font-size: 1.4rem; }
-  .editbar-inner { padding: 10px 16px; }
+  body { font-size: 16px; }
+  .sheet { padding: 0 8px; }
+  .nav-list { justify-content: center; }
+  .nav-list a { font-size: 1.05rem; padding: 6px 8px; }
+  .page-inner > .half { flex-basis: 100%; }
+  .page-title { font-size: 1.45rem; }
+  .block-text p { text-align: left; }
+  .editbar-inner { padding: 10px 12px; }
   .btn { padding: 11px 16px; }
   body.editing { padding-top: 118px; }
+  .lightbox { padding: 16px 8px; }
+  .lightbox-nav { top: auto; bottom: 14px; transform: none; }
 }
 
 @media print {
-  .site-nav, .site-footer, .editbar, .photo-actions, .nav-toggle, .skip-link { display: none !important; }
-  body { font-size: 12pt; }
-  .site-header { background: none; color: #000; }
+  .site-nav, .editbar, .photo-actions, .skip-link, .footer-edit, .to-top { display: none !important; }
+  body, html { background: #fff; color: #000; font-size: 11pt; }
+  .block-text strong, .page-title, .block h2 { color: #000; }
 }
+
+/* Els panells d'ajuda/admin son clars: text fosc encara que la pagina sigui negra */
+.help-note, .admin-pagebar, .add-block, .block-controls, .dialog, .editbar { color: var(--ink); }

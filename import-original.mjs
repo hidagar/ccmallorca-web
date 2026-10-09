@@ -17,8 +17,10 @@ import { fileURLToPath } from 'node:url'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const ORIGINAL_DIR = path.join(HERE, 'original')
-const DATA_DIR = process.env.CCM_DATA_DIR || '/var/www/ccmallorca-data'
-const UPLOADS_DIR = path.join(DATA_DIR, 'uploads')
+const DATA_DIR = process.env.CCM_DATA_DIR || path.join(process.env.HOME || '', 'ccmallorca-data')
+// Amb la versio PHP les fotos van a la carpeta publica (uploads/ al costat
+// d'api.php); indica-la amb CCM_UPLOADS_DIR.
+const UPLOADS_DIR = process.env.CCM_UPLOADS_DIR || path.join(DATA_DIR, 'uploads')
 const DRY = process.argv.includes('--dry')
 
 // Pagines que no son contingut real
