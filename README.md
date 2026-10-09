@@ -2,7 +2,9 @@
 
 Web de espeleología con un editor **al estilo FrontPage**: el cliente edita
 directamente encima de la página, sin panel de administración. Mismas secciones
-que su web actual, pero con diseño moderno y funcionando en móvil y tablet.
+y **mismo aspecto** que su web actual (fondo negro, columna de 900px, cabecera
+por sección, menú dorado en Book Antiqua, fotos en mosaico con el autor en la
+esquina), pero funcionando en móvil y tablet.
 
 - **Sin base de datos:** todo el contenido vive en un único `content.json`.
 - **Sin compilación:** HTML, CSS y JavaScript planos.
@@ -121,10 +123,15 @@ dentro del `server { ... }` de tu configuración de nginx.
    - **Textos:** clic encima y escribir. Al seleccionar texto sale una
      barrita con negrita, cursiva, lista y enlace.
    - **Fotos:** botones «Cambiar foto» / «Poner foto» / «Quitar foto».
-   - **Galería:** además puede añadir y quitar fotos.
+   - **Grupos de fotos (mosaicos):** debajo de cada mosaico hay una lista
+     donde puede añadir **varias fotos a la vez**, cambiarlas de orden,
+     quitarlas y escribir el autor y la descripción de cada una.
    - **Documentos PDF:** botón «Añadir documento PDF» / «Cambiar PDF» /
      «Quitar PDF» — ya no hace falta el FTP para subir anexos e informes.
-4. Pulsa **«Guardar cambios»** (botón verde).
+4. Pulsa **«Guardar cambios»** (botón verde) o **Ctrl+S**.
+
+Los visitantes pueden ampliar cualquier foto con un clic y pasar a la
+siguiente con las flechas (o deslizando el dedo en el móvil).
 
 También puede **«Descartar»** para volver a la última versión guardada, o
 **«Salir»** para dejar el modo edición. Si intenta cerrar la pestaña con
@@ -145,9 +152,18 @@ controles de estructura. Es la misma web, encima de la propia página (WYSIWYG):
 - **Cajones** (cada bloque tiene una barra encima):
   - **↑ Subir** / **↓ Bajar** para reordenar
   - **🗑 Borrar** el cajón
-- **Añadir un cajón nuevo** al final de la página: Título, Texto, Foto,
-  Galería de fotos, o Documento PDF
-- **Imagen de cabecera**: banner opcional arriba de cada página
+- **Añadir un cajón nuevo** al final de la página: Título, Texto, Foto
+  grande, Grupo de fotos (mosaico), o Documento PDF
+- **Media columna**: dos cajones seguidos de media columna quedan uno al
+  lado del otro (p. ej. «Resumen | Summary» en Artículos)
+- **Disposición de cada grupo de fotos**: en fila (misma altura, sin
+  recortar), mosaico «2 apiladas + 1 alta» a la derecha o a la izquierda,
+  o rejilla con pies de foto
+- **Estilo de la página**: fondo negro (como la portada) u hoja blanca
+  (como Artículos)
+- **Imagen de cabecera** (la tira de 900×60 de cada sección). Si no se
+  pone, se genera una automática con el nombre de la sección. El cliente
+  puede cambiarla, pero solo el admin ponerla o quitarla.
 
 Cuando guardas como admin, se guarda la **estructura entera** (endpoint
 `/api/structure`). Lo que hagas aquí define qué puede editar luego el cliente:

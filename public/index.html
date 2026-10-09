@@ -5,53 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CC Mallorca · Corpus Cavernario Mayoricense</title>
   <meta name="description" content="Documentación de cavidades, yacimientos y hallazgos del archipiélago balear, a cargo de J. A. Encinas.">
-  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#000000">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
   <a class="skip-link" href="#contenido">Ir al contenido</a>
 
-  <header class="site-header">
-    <div class="wrap header-inner">
-      <div class="brand">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 32 32" width="34" height="34" role="img" aria-label="">
-            <path d="M2 26 L11 9 L17 19 L21 13 L30 26 Z" fill="currentColor" opacity=".85"/>
-            <circle cx="24" cy="7" r="3" fill="currentColor" opacity=".55"/>
-          </svg>
-        </span>
-        <span class="brand-text">
-          <span class="brand-title" data-edit="site.title">CC Mallorca</span>
-          <span class="brand-subtitle" data-edit="site.subtitle">Cuevas y simas del archipiélago Balear</span>
-        </span>
-      </div>
-      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mainNav">
-        <span aria-hidden="true">☰</span> Menú
-      </button>
-    </div>
-    <nav class="site-nav" id="mainNav" aria-label="Secciones">
-      <ul class="wrap nav-list" id="navList"></ul>
-    </nav>
-  </header>
+  <div class="sheet">
+    <header class="site-header">
+      <!-- Baner de la seccio (imatge de capçalera de la pagina o, si no
+           n'hi ha, un baner generat amb el nom de la seccio) -->
+      <div class="banner" id="banner"></div>
+      <nav class="site-nav" id="mainNav" aria-label="Secciones">
+        <ul class="nav-list" id="navList"></ul>
+      </nav>
+    </header>
 
-  <main id="contenido" class="wrap page" aria-live="polite">
-    <p class="loading">Cargando…</p>
-  </main>
+    <main id="contenido" class="page" aria-live="polite">
+      <p class="loading">Cargando…</p>
+    </main>
 
-  <footer class="site-footer">
-    <div class="wrap footer-inner">
-      <p class="footer-text" data-edit="site.footer">CC Mallorca</p>
-      <p class="footer-meta">
+    <footer class="site-footer">
+      <p class="footer-text" data-edit="site.footer">"Corpus cavernario mayoricense"</p>
+      <p class="footer-mail">
         <a id="footerEmail" href="mailto:jaencinas.ccmallorca@gmail.com">jaencinas.ccmallorca@gmail.com</a>
-        <span aria-hidden="true">·</span>
+      </p>
+      <p class="footer-edit">
         <button type="button" class="edit-entry" id="editEntry">Editar la web</button>
       </p>
-    </div>
-  </footer>
+    </footer>
+  </div>
 
   <noscript>
-    <div class="wrap"><p>Esta web necesita JavaScript activado para mostrar el contenido.</p></div>
+    <p style="color:#DDA74D;text-align:center">Esta web necesita JavaScript activado para mostrar el contenido.</p>
   </noscript>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

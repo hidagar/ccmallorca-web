@@ -127,6 +127,29 @@ function isSafeSrc(src) {
   return /^uploads\/[\w.\-]+$/.test(src) || /^img\/[\w.\-/]+$/.test(src) || /^https:\/\/[^\s"'<>]+$/.test(src)
 }
 
+// Proporcio ample/alt d'una foto (la calcula el navegador en pujar-la). Serveix
+// per muntar els mosaics sense salts mentre carreguen les imatges.
+function cleanRatio(r) {
+  const n = Number(r)
+  return isFinite(n) && n >= 0.1 && n <= 10 ? Math.round(n * 1000) / 1000 : undefined
+}
+
+function cleanImage(im) {
+  const out = {
+    src: im.src,
+    alt: stripTags(im.alt || '').slice(0, 300),
+    caption: stripTags(im.caption || '').slice(0, 300),
+    credit: stripTags(im.credit || '').slice(0, 120),
+  }
+  const ratio = cleanRatio(im.ratio)
+  if (ratio) out.ratio = ratio
+  return out
+}
+
+// Opcions de disseny (nomes les pot canviar l'admin)
+const PAGE_THEMES = ['oscuro', 'papel']
+const GALLERY_LAYOUTS = ['fila', 'mosaico', 'mosaico-izquierda', 'rejilla']
+
 // ------------------------------------------------------------- dades i auth
 
 async function ensureData() {
@@ -298,25 +321,25 @@ function mergeContent(current, incoming) {
         dest.html = sanitizeHtml(block.html)
       }
       if (dest.type === 'image') {
-        if (isSafeSrc(block.src)) dest.src = block.src
+        const prevSrc = dest.src
+        // '' = el client ha tret la foto
+        if (isSafeSrc(block.src) || block.src === '') dest.src = block.src
         if (typeof block.alt === 'string') dest.alt = stripTags(block.alt).slice(0, 300)
         if (typeof block.caption === 'string') dest.caption = stripTags(block.caption).slice(0, 300)
         if (typeof block.credit === 'string') dest.credit = stripTags(block.credit).slice(0, 120)
+        const ratio = cleanRatio(block.ratio)
+        if (ratio) dest.ratio = ratio
+        else if (dest.src !== prevSrc || !dest.src) delete dest.ratio
       }
       if (dest.type === 'document') {
-        if (isSafeSrc(block.src)) dest.src = block.src
+        if (isSafeSrc(block.src) || block.src === '') dest.src = block.src
         if (typeof block.label === 'string') dest.label = stripTags(block.label).slice(0, 200)
       }
       if (dest.type === 'gallery' && Array.isArray(block.images)) {
         dest.images = block.images
           .filter((im) => im && isSafeSrc(im.src))
           .slice(0, 80)
-          .map((im) => ({
-            src: im.src,
-            alt: stripTags(im.alt || '').slice(0, 300),
-            caption: stripTags(im.caption || '').slice(0, 300),
-            credit: stripTags(im.credit || '').slice(0, 120),
-          }))
+          .map(cleanImage)
       }
     }
   }
@@ -353,6 +376,12 @@ function makeId(prefix, used) {
   return id
 }
 
+// Ample del calaix: 'half' el posa a mitja columna (p. ex. Resumen | Summary)
+function withLayout(block, raw) {
+  if (raw && raw.width === 'half') block.width = 'half'
+  return block
+}
+
 function sanitizeBlock(raw, usedIds) {
   if (!raw || BLOCK_TYPES.indexOf(raw.type) === -1) return null
   const id = raw.id && /^[\w-]{1,80}$/.test(raw.id) && !usedIds[raw.id]
@@ -360,38 +389,37 @@ function sanitizeBlock(raw, usedIds) {
     : makeId(raw.type + '-' + (raw.text || raw.label || ''), usedIds)
 
   if (raw.type === 'heading') {
-    return { id, type: 'heading', text: stripTags(raw.text || '').slice(0, 200) }
+    return withLayout({ id, type: 'heading', text: stripTags(raw.text || '').slice(0, 200) }, raw)
   }
   if (raw.type === 'text') {
-    return { id, type: 'text', html: sanitizeHtml(raw.html || '') }
+    return withLayout({ id, type: 'text', html: sanitizeHtml(raw.html || '') }, raw)
   }
   if (raw.type === 'image') {
-    return {
+    const ratio = cleanRatio(raw.ratio)
+    return withLayout({
       id, type: 'image',
+      ...(ratio && isSafeSrc(raw.src) ? { ratio } : {}),
       src: isSafeSrc(raw.src) ? raw.src : '',
       alt: stripTags(raw.alt || '').slice(0, 300),
       caption: stripTags(raw.caption || '').slice(0, 300),
       credit: stripTags(raw.credit || '').slice(0, 120),
-    }
+    }, raw)
   }
   if (raw.type === 'document') {
-    return {
+    return withLayout({
       id, type: 'document',
       src: isSafeSrc(raw.src) ? raw.src : '',
       label: stripTags(raw.label || '').slice(0, 200),
-    }
+    }, raw)
   }
   if (raw.type === 'gallery') {
     const images = (Array.isArray(raw.images) ? raw.images : [])
       .filter((im) => im && isSafeSrc(im.src))
       .slice(0, 80)
-      .map((im) => ({
-        src: im.src,
-        alt: stripTags(im.alt || '').slice(0, 300),
-        caption: stripTags(im.caption || '').slice(0, 300),
-        credit: stripTags(im.credit || '').slice(0, 120),
-      }))
-    return { id, type: 'gallery', images }
+      .map(cleanImage)
+    const out = { id, type: 'gallery', images }
+    if (GALLERY_LAYOUTS.indexOf(raw.layout) !== -1) out.layout = raw.layout
+    return withLayout(out, raw)
   }
   return null
 }
@@ -434,6 +462,7 @@ function sanitizeStructure(incoming) {
       intro: sanitizeHtml(page.intro || ''),
       blocks,
     }
+    if (PAGE_THEMES.indexOf(page.theme) !== -1) outPage.theme = page.theme
     // Imatge de capçalera opcional (bàner al capdamunt de la pàgina)
     if (page.header && isSafeSrc(page.header.src)) {
       outPage.header = {
@@ -529,6 +558,12 @@ function syncStructure(current, defaults) {
 
     if (!Array.isArray(curPage.blocks)) {
       curPage.blocks = []
+      changed = true
+    }
+
+    // Estil de pagina nou al default (p. ex. "papel"): nomes si no en te cap
+    if (defPage.theme && !curPage.theme) {
+      curPage.theme = defPage.theme
       changed = true
     }
 
