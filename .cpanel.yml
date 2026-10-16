@@ -1,14 +1,13 @@
 # El fa servir cPanel (Git™ Version Control -> "Deploy HEAD Commit"):
-# copia la web a la carpeta del subdomini. Nomes AFEGEIX o SOBREESCRIU
+# copia la web a public_html/beta (http://ccmallorca.net/beta/). Nomes AFEGEIX o SOBREESCRIU
 # fitxers del codi: uploads/ (fotos del client) i les dades de
 # ~/ccmallorca-data no es toquen mai.
 #
-# Si el subdomini te una altra carpeta (Dominios -> "Raíz del documento"),
-# canvia DEPLOYPATH.
+# Per publicar-la a una altra carpeta, canvia DEPLOYPATH.
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=$HOME/beta.ccmallorca.net/
+    - export DEPLOYPATH=$HOME/public_html/beta/
     - /bin/mkdir -p $DEPLOYPATH
     - /bin/cp -R public/. $DEPLOYPATH
     - /bin/cp content.default.json $DEPLOYPATH

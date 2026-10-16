@@ -23,12 +23,21 @@ Funciona en **PHP** (7.0 o superior, cualquier cPanel lo tiene). No hay
 que crear ninguna app ni reiniciar nada: son archivos que se copian a la
 carpeta del subdominio.
 
-### 1. Subdominio de revisión
+### 1. Carpeta de revisión
 
-**Dominios → Dominios** → crea `beta.ccmallorca.net` con su propia
-carpeta. Fíjate en la **raíz del documento** que propone cPanel
-(normalmente `/home/TU_USUARIO/beta.ccmallorca.net`). Si es otra, cambia
-`DEPLOYPATH` en [`.cpanel.yml`](./.cpanel.yml).
+La versión de prueba se publica en **http://ccmallorca.net/beta/**, es
+decir, en la carpeta `public_html/beta` (el DNS de ccmallorca.net está en
+Hostinet, así que un subdominio `beta.` no resolvería sin tocarlo allí).
+Si quieres otra carpeta, cambia `DEPLOYPATH` en [`.cpanel.yml`](./.cpanel.yml).
+
+> Si antes tenías la versión Node en **Setup Node.js App** con la URL
+> `ccmallorca.net/beta`, **bórrala** (solo la app, no el repositorio):
+> si no, sigue interceptando `/beta` y no se ve la versión PHP.
+>
+> Las fotos que se subieran con la versión Node están en
+> `~/ccmallorca-data/uploads/`: cópialas una vez a `public_html/beta/uploads/`
+> con el Administrador de archivos. Los textos (`content.json`) se
+> conservan; las contraseñas se regeneran en `CONTRASENAS.txt`.
 
 ### 2. Traer el código con Git Version Control
 
@@ -38,7 +47,7 @@ carpeta. Fíjate en la **raíz del documento** que propone cPanel
 
 Entra en el repo → **Pull or Deploy** → elige la rama → **"Deploy HEAD
 Commit"**. El `.cpanel.yml` copia la carpeta `public/` y
-`content.default.json` a la carpeta del subdominio.
+`content.default.json` a `public_html/beta`.
 
 ### 3. Primera visita: contraseñas
 
@@ -52,12 +61,11 @@ archivos). Entra con la de administrador y cámbialas desde el botón
 **«🔑 Contraseñas»** del panel azul.
 
 Si prefieres elegirlas antes de la primera visita, copia
-`config.local.example.php` como `config.local.php` en la carpeta del
-subdominio y pon ahí las contraseñas (o una carpeta de datos distinta).
+`config.local.example.php` como `config.local.php` en `public_html/beta` y pon ahí las contraseñas (o una carpeta de datos distinta).
 
 ### 4. SSL
 
-**Seguridad → Let's Encrypt™ SSL** (o AutoSSL) para `beta.ccmallorca.net`.
+**Seguridad → Let's Encrypt™ SSL** (o AutoSSL) para `ccmallorca.net`.
 
 ### Actualizar tras cambios en el código
 
@@ -70,8 +78,8 @@ sus textos (`ccmallorca-data/`).
 
 | Dónde | Qué | ¿Se pisa al desplegar? |
 |---|---|---|
-| `beta.ccmallorca.net/` | `index.html`, `app.js`, `styles.css`, `api.php`… | Sí (es el código) |
-| `beta.ccmallorca.net/uploads/` | fotos y PDF que sube el cliente | No |
+| `public_html/beta/` | `index.html`, `app.js`, `styles.css`, `api.php`… | Sí (es el código) |
+| `public_html/beta/uploads/` | fotos y PDF que sube el cliente | No |
 | `~/ccmallorca-data/` | textos (`content.json`), contraseñas, copias de seguridad | No |
 
 > **Límites de subida:** `public/.user.ini` sube el límite de PHP a 25 MB
