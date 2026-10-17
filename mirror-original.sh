@@ -3,11 +3,11 @@
 # traslladar-ne els textos, les seccions i l'inventari de fotos.
 #
 # Ús:
-#   bash clients/ccmallorca/mirror-original.sh           # nomes HTML (lleuger)
-#   bash clients/ccmallorca/mirror-original.sh --fotos   # HTML + imatges
+#   bash mirror-original.sh           # nomes HTML (lleuger)
+#   bash mirror-original.sh --fotos   # HTML + imatges i PDF
 #
-# Despres puja el resultat al repositori:
-#   git add clients/ccmallorca/original && git commit -m "copia de la web original" && git push
+# Al final deixa original-html.zip (nomes les pagines) per adjuntar-lo
+# a la conversa amb Claude si ell no pot arribar a ccmallorca.net.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -15,8 +15,8 @@ DEST="$HERE/original"
 SITE=https://www.ccmallorca.net/
 WITH_PHOTOS="${1:-}"
 
-if ! command -v wget >/dev/null; then
-  echo "Cal instal·lar wget:  sudo apt install -y wget"
+if ! command -v wget >/dev/null || ! command -v zip >/dev/null; then
+  echo "Cal instal·lar wget i zip:  sudo apt install -y wget zip"
   exit 1
 fi
 
@@ -67,15 +67,13 @@ echo "    $(wc -l < "$DEST/inventari-fotos.txt" 2>/dev/null || echo 0) fotos ref
 
 echo "==> Mida de la copia: $(du -sh "$DEST" | cut -f1)"
 
-cat <<'INFO'
+(cd "$DEST" && find . -type f -iname '*.htm*' -print | zip -q -@ "$HERE/original-html.zip") || true
+
+cat <<INFO
 
 ============================================================
- Copia feta a clients/ccmallorca/original/
- Puja-la al repositori perque es pugui fer servir el contingut real:
-
-     cd ~/sebastia
-     git add clients/ccmallorca/original
-     git commit -m "copia de la web original de ccmallorca"
-     git push -u origin claude/cool-tesla-jn22yt
+ Copia feta a: $DEST
+ Pagines en un sol fitxer: $HERE/original-html.zip
+ (adjunta'l a la conversa perque Claude les trasllade a la web nova)
 ============================================================
 INFO

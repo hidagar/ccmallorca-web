@@ -4,7 +4,7 @@
 // Us:
 //   node import-original.mjs [--dry]
 //
-// Llegeix   clients/ccmallorca/original/
+// Llegeix   original/
 // Escriu    $CCM_DATA_DIR/content.json  i  $CCM_DATA_DIR/uploads/
 //
 // Els textos i les fotos surten de la web real; l'estructura es genera un
@@ -267,7 +267,7 @@ async function findHtmlFiles(dir) {
 async function main() {
   if (!existsSync(ORIGINAL_DIR)) {
     console.error('ERROR: no hi ha la copia de la web original.')
-    console.error('Executa primer:  bash clients/ccmallorca/mirror-original.sh --fotos')
+    console.error('Executa primer:  bash mirror-original.sh --fotos')
     process.exit(1)
   }
 
