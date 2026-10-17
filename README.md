@@ -98,6 +98,28 @@ y abre <http://localhost:8000>. Los datos se crean en `~/ccmallorca-data`
 
 ---
 
+## Servidor propio (Ubuntu) para enseñársela al cliente
+
+En un Ubuntu (por ejemplo el de casa), con tu usuario normal, no root:
+
+```bash
+sudo apt-get install -y git
+git clone https://github.com/hidagar/ccmallorca-web.git ~/ccmallorca-web
+bash ~/ccmallorca-web/servidor/instalar-ubuntu.sh
+```
+
+Instala nginx y PHP, copia la web a `/var/www/ccmallorca`, guarda los datos
+en `/var/lib/ccmallorca-data` y activa una **actualización automática**: cada
+5 minutos baja de GitHub los cambios de `main` y los publica sola. Al
+terminar muestra la dirección y las dos contraseñas (cliente y administrador).
+
+- Usa el puerto **80**; si en ese servidor ya hay otra web (p. ej. el
+  Cuaderno de Verano), usa el **8080**. Otro: `PORT=8081 bash …/instalar-ubuntu.sh`.
+- Se puede volver a ejecutar sin miedo: no borra fotos ni textos.
+- Actualizar a mano: `bash ~/ccmallorca-web/servidor/desplegar.sh`.
+
+---
+
 ## Cómo la edita el cliente
 
 1. Entra en la web y pulsa **«Editar la web»** (abajo, en el pie).
