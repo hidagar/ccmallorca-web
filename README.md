@@ -165,8 +165,6 @@ controles de estructura. Es la misma web, encima de la propia página (WYSIWYG):
 - **Disposición de cada grupo de fotos**: en fila (misma altura, sin
   recortar), mosaico «2 apiladas + 1 alta» a la derecha o a la izquierda,
   o rejilla con pies de foto
-- **Estilo de la página**: fondo negro (como la portada) u hoja blanca
-  (como Artículos)
 - **Imagen de cabecera** (la tira de 900×60 de cada sección). Si no se
   pone, se genera una automática con el nombre de la sección. El cliente
   puede cambiarla, pero solo el admin ponerla o quitarla.

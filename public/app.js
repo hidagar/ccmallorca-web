@@ -930,16 +930,6 @@
       if (menu[mi]) { menu[mi].label = labelInput.value; markDirty(); renderNav(); renderBanner() }
     })
 
-    var theme = el('select', { class: 'admin-select', 'aria-label': 'Estilo de la página' }, [
-      el('option', { value: 'oscuro', text: 'Fondo negro (como la portada)', selected: page.theme !== 'papel' ? 'selected' : null }),
-      el('option', { value: 'papel', text: 'Hoja blanca (como Artículos)', selected: page.theme === 'papel' ? 'selected' : null }),
-    ])
-    theme.addEventListener('change', function () {
-      if (theme.value === 'papel') page.theme = 'papel'
-      else delete page.theme
-      markDirty(); renderPage()
-    })
-
     function movePage(delta) {
       var j = mi + delta
       if (j < 0 || j >= menu.length) return
@@ -954,10 +944,6 @@
         labelInput,
         el('button', { type: 'button', class: 'btn btn-ghost btn-sm', text: '← Mover', disabled: mi <= 0, onclick: function () { movePage(-1) } }),
         el('button', { type: 'button', class: 'btn btn-ghost btn-sm', text: 'Mover →', disabled: mi >= menu.length - 1, onclick: function () { movePage(1) } }),
-      ]),
-      el('div', { class: 'admin-row' }, [
-        el('span', { text: 'Estilo:' }),
-        theme,
       ]),
       el('div', { class: 'admin-row' }, [
         el('button', { type: 'button', class: 'btn btn-admin btn-sm', text: '+ Crear página nueva', onclick: createPage }),
@@ -1039,7 +1025,7 @@
       main.appendChild(el('p', { text: 'Sección no encontrada.' }))
       return
     }
-    main.classList.add(page.theme === 'papel' ? 'theme-papel' : 'theme-oscuro')
+    main.classList.add('theme-oscuro')
     pagePhotos = collectPhotos(page)
 
     if (state.admin) {

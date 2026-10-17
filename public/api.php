@@ -31,7 +31,6 @@ define('CONFIG_FILE', DATA_DIR . '/config.json');
 define('BACKUP_DIR', DATA_DIR . '/backups');
 define('ATTEMPTS_FILE', DATA_DIR . '/intentos.json');
 
-const PAGE_THEMES = array('oscuro', 'papel');
 const GALLERY_LAYOUTS = array('fila', 'mosaico', 'mosaico-izquierda', 'rejilla');
 const BLOCK_TYPES = array('heading', 'text', 'image', 'gallery', 'document');
 const MAX_PAGES = 40;
@@ -534,7 +533,6 @@ function sanitize_structure($incoming)
             'intro' => sanitize_html(str(isset($page['intro']) ? $page['intro'] : '')),
             'blocks' => $blocks,
         );
-        if (isset($page['theme']) && in_array($page['theme'], PAGE_THEMES, true)) $outPage['theme'] = $page['theme'];
         if (isset($page['header']['src']) && is_safe_src($page['header']['src'])) {
             $outPage['header'] = array(
                 'src' => $page['header']['src'],
@@ -591,7 +589,6 @@ function sync_structure(&$current, $defaults)
         }
         $cur = &$current['pages'][$slug];
         if (!isset($cur['blocks']) || !is_array($cur['blocks'])) { $cur['blocks'] = array(); $changed = true; }
-        if (!empty($defPage['theme']) && empty($cur['theme'])) { $cur['theme'] = $defPage['theme']; $changed = true; }
         $at = 0;
         foreach ((isset($defPage['blocks']) ? $defPage['blocks'] : array()) as $defBlock) {
             $idx = -1;
